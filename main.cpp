@@ -7,8 +7,11 @@
 #include "code/Objects/Entity/Enemies/Enemy.h"
 #include "code/Interfaces/World.h"
 #include "code/Interfaces/Settings.h"
+#include "code/Interfaces/SMath.h"
 #include "code/Objects/Entity/Collider.h"
-#include "code/Objects/Blocks/Wall.h"
+#include "code/Visual/Shape.h"
+
+#include <array>
 
 using namespace std;
 
@@ -18,9 +21,11 @@ int main()
 
     World::setMap();
 
-    Player player(sf::Vector2f(48.f, 48.f));
+    Player player(SMath::vec2f(320.f + 34.f, 78.f + 34.f));
+    player.addChildren(new Circle(10.f, fv::Color::green));
     World::addObject(&player);
-    Enemy enemy(sf::Vector2f(248.f, 78.f));
+    Enemy enemy(SMath::vec2f(248.f, 78.f));
+    enemy.addChildren(new Circle(15.f, fv::Color::blue));
     enemy.addChildren(new ColliderCircle(15.f));
     player.addChildren(new ColliderCircle(10.f));
     World::addObject(&enemy);
@@ -30,7 +35,9 @@ int main()
     sf::Time currentTime = sf::seconds(0);
     float delta = 0;
 
-    Render::init();
+    Render::init(&window);
+    SMath::vec2f f = 2.f * SMath::vec2f(1, 2);
+    std::cout << f.x << "  " << f.y << "\n";
 
     while (window.isOpen())
     {
@@ -57,11 +64,13 @@ int main()
         player.movement(delta);
         player.physics(delta);
 
-        Render::renderAll(window);
+        Render::renderAllShapes();
+        player.render(window);
         if (Settings::showFpsCounter)
         {
-            Render::renderFpsCounter(window, delta);
+            Render::renderFpsCounter(delta);
         }
+
         window.display();
     }
 

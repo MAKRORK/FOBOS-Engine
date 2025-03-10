@@ -1,5 +1,7 @@
 #include "World.h"
+#include "SMath.h"
 #include "../Objects/Blocks/Wall.h"
+#include "../Visual/Shape.h"
 
 std::vector<Object *> World::objects;
 string *World::map;
@@ -22,19 +24,18 @@ void World::setMap()
     map[9] = "#   ######         #";
     map[10] = "#                  #";
     map[11] = "####################";
-    mapBlocks = new int *[mapHeight];
+    // mapBlocks = new int *[mapHeight];
     for (int i = 0; i < mapHeight; i++)
     {
-        mapBlocks[i] = new int[mapWidth];
+        // mapBlocks[i] = new int[mapWidth];
         for (int j = 0; j < mapWidth; j++)
         {
             if (map[i][j] == '#')
             {
-                mapBlocks[i][j] = addObject(new Wall(sf::Vector2f(j * 32, i * 32)));
-            }
-            else
-            {
-                mapBlocks[i][j] = -1;
+                int t = addObject(new Wall(SMath::vec2f(j * 32, i * 32)));
+                Rect *r = new Rect(SMath::vec2f(32.f, 32.f));
+                r->setColor(fv::Color::white);
+                getObjectByIndex(t)->addChildren(r);
             }
         }
     }

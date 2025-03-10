@@ -1,20 +1,21 @@
 #include "Object.h"
 #include "Entity/Collider.h"
+#include "../Visual/Shape.h"
 #include <cmath>
 
 Object::Object()
 {
-    pos = sf::Vector2f(0.f, 0.f);
+    pos = SMath::vec2f(0.f, 0.f);
     rot = 0.f;
 }
 
-Object::Object(sf::Vector2f _pos)
+Object::Object(SMath::vec2f _pos)
 {
     pos = _pos;
     rot = 0.f;
 }
 
-void Object::setPos(sf::Vector2f _pos)
+void Object::setPos(SMath::vec2f _pos)
 {
     pos = _pos;
 }
@@ -23,7 +24,7 @@ void Object::setRot(float _rot)
     rot = _rot;
 }
 
-void Object::addPos(sf::Vector2f _pos)
+void Object::addPos(SMath::vec2f _pos)
 {
     pos += _pos;
 }
@@ -33,7 +34,26 @@ void Object::addRot(float _rot)
     rot += _rot;
 }
 
-sf::Vector2f Object::getPos()
+float Object::getScale()
+{
+    return scale;
+}
+
+float Object::getWorldScale()
+{
+    if (parent)
+    {
+        return scale * parent->getWorldScale();
+    }
+    return scale;
+}
+
+void Object::setScale(float _s)
+{
+    scale = _s;
+}
+
+SMath::vec2f Object::getPos()
 {
     return pos;
 }
@@ -41,7 +61,7 @@ float Object::getRot()
 {
     return rot;
 }
-sf::Vector2f Object::getWorldPos()
+SMath::vec2f Object::getWorldPos()
 {
     if (parent)
     {
@@ -58,7 +78,7 @@ float Object::getWorldRot()
     return rot;
 }
 
-void Object::addChildren(Object *child)
+int Object::addChildren(Object *child)
 {
     if (child)
     {
@@ -72,6 +92,7 @@ void Object::addChildren(Object *child)
         }
     }
     childrens.push_back(child);
+    return childrens.size() - 1;
 }
 
 void Object::setParent(Object *_parent)
@@ -88,7 +109,30 @@ Object *Object::getColliderObject()
     return collider;
 }
 
-sf::Vector2f Object::getForwardVector()
+Object *Object::getChildrenByIndex(int i)
 {
-    return sf::Vector2f(cosf(getWorldRot()), sinf(getWorldRot()));
+    return childrens[i];
+}
+
+std::vector<Object *> Object::getChildrens()
+{
+    return childrens;
+}
+
+vector<Object *> Object::getShapes()
+{
+    vector<Object *> s;
+    for (int i = 0; i < childrens.size(); i++)
+    {
+        if (dynamic_cast<Shape *>(childrens[i]))
+        {
+            s.push_back(childrens[i]);
+        }
+    }
+    return s;
+}
+
+SMath::vec2f Object::getForwardVector()
+{
+    return SMath::vec2f(cosf(getWorldRot()), sinf(getWorldRot()));
 }

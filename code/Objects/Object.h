@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Vector2.hpp>
+#include "../Interfaces/SMath.h"
 #include <vector>
 #include <iostream>
 
@@ -8,33 +9,43 @@ class Object
 {
 public:
     Object();
-    Object(sf::Vector2f _pos);
+    Object(SMath::vec2f _pos);
+    virtual void update() {}
 
-    virtual void render(sf::RenderWindow &window) {}
-
-    void setPos(sf::Vector2f _pos);
+    void setPos(SMath::vec2f _pos);
     void setRot(float _rot);
-    void addPos(sf::Vector2f _pos);
+    void addPos(SMath::vec2f _pos);
     void addRot(float _rot);
 
-    sf::Vector2f getPos();
+    float getScale();
+    float getWorldScale();
+    void setScale(float _s);
+
+    SMath::vec2f getPos();
     float getRot();
-    sf::Vector2f getWorldPos();
+    SMath::vec2f getWorldPos();
     float getWorldRot();
 
-    void addChildren(Object *child);
+    int addChildren(Object *child);
 
     void setParent(Object *_parent);
     Object *getParent();
 
     Object *getColliderObject();
 
-    sf::Vector2f getForwardVector();
+    Object *getChildrenByIndex(int i);
+
+    std::vector<Object *> getChildrens();
+
+    std::vector<Object *> getShapes();
+
+    SMath::vec2f getForwardVector();
 
 private:
     Object *collider = nullptr;
     Object *parent = nullptr;
-    sf::Vector2f pos;
+    SMath::vec2f pos;
     float rot;
+    float scale = 1.f;
     std::vector<Object *> childrens;
 };

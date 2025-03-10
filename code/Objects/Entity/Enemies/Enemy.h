@@ -6,17 +6,16 @@
 class Enemy : public Entity
 {
 public:
-    void render(sf::RenderWindow &window) override;
+    void update() override {}
     Enemy() : Entity()
     {
         init();
     }
-    Enemy(sf::Vector2f _pos) : Entity(_pos)
+    Enemy(SMath::vec2f _pos) : Entity(_pos)
     {
         init();
     }
 
 private:
-    sf::CircleShape shape;
     void init();
-}; 
+};

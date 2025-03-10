@@ -1,6 +1,6 @@
 #include "Collider.h"
 #include "../../Interfaces/World.h"
-#include "../../Interfaces/SMath.h"
+
 #include "Entity.h"
 #include <cmath>
 
@@ -14,6 +14,8 @@ void ColliderCircle::collision()
     {
 
         Object *obj = World::getObjectByIndex(i);
+        if (obj == getParent())
+            continue;
         if (obj->getColliderObject())
         {
             Collider *col;
@@ -22,62 +24,30 @@ void ColliderCircle::collision()
 
             if (col)
             {
-
-                if (col->getType() == COLLIDER_TYPE_RECT)
+                if (col->getType() == COLLIDER_TYPE_LINE)
                 {
+                    ColliderLine *l = dynamic_cast<ColliderLine *>(col);
 
+                    p->addImpulse(Collider::getMTVPolyCircle(l->getSide(), p->getWorldPos() + p->getVel(), getRadius()));
+                }
+
+                else if (col->getType() == COLLIDER_TYPE_RECT)
+                {
                     ColliderRect *rect = dynamic_cast<ColliderRect *>(col);
 
-                    sf::Vector2f point[4];
-                    point[0] = rect->getParent()->getPos();
-                    point[1] = rect->getParent()->getPos() + sf::Vector2f(rect->getSize().x, 0);
-                    point[2] = rect->getParent()->getPos() + rect->getSize();
-                    point[3] = rect->getParent()->getPos() + sf::Vector2f(0, rect->getSize().y);
+                    p->addImpulse(Collider::getMTVPolyCircle(rect->getSides(), p->getWorldPos() + p->getVel(), getRadius()));
+                }
 
-                    sf::Vector2f m = point[0];
-                    float md = SMath::length((p->getWorldPos() + p->getVel()), point[0]);
-                    for (int i = 1; i < 4; i++)
+                else if (col->getType() == COLLIDER_TYPE_CIRCLE)
+                {
+                    ColliderCircle *c = dynamic_cast<ColliderCircle *>(col);
+                    SMath::vec2f h = (p->getWorldPos() + p->getVel()) - c->getWorldPos();
+                    if (SMath::length(h) < getRadius() + c->getRadius())
                     {
-                        float l = SMath::length((p->getWorldPos() + p->getVel()), point[i]);
-                        if (l < md)
-                        {
-                            m = point[i];
-                            md = l;
-                        }
-                    }
-                    if (md <= getRadius())
-                    {
-                        sf::Vector2f mtv = (getRadius() - md) * SMath::normalize(p->getWorldPos() - m);
+                        SMath::vec2f mtv = SMath::normalize(h) * ((getRadius() + c->getRadius()) - SMath::length(h));
+
                         p->addImpulse(mtv);
                     }
-
-                    // collisionCircleResult res[4];
-                    // for (int i = 0; i < 4; i++)
-                    // {
-                    //     // cout << rect->getSide(i).p1.x << " " << rect->getSide(i).p1.y << "    " << rect->getSide(i).p2.x << " " << rect->getSide(i).p2.y << endl;
-                    //     res[i] = checkCollisionLineWithCircle(rect->getSide(i), p->getWorldPos() + p->getVel(), getRadius());
-                    // }
-                    // sf::Vector2f backVel = sf::Vector2f(0, 0);
-                    // // cout << p->getVel().x << " " << p->getVel().y << "\n";
-                    // for (int i = 0; i < 4; i++)
-                    // {
-                    //     if (res[i].isColliding)
-                    //     {
-                    //         // cout << getRadius() - SMath::distToLine(rect->getSide(i), p->getWorldPos() + p->getVel()) << endl;
-                    //         sf::Vector2f normal = rect->getNormal(i);
-
-                    //         backVel += normal * (getRadius() - SMath::distToLine(rect->getSide(i), p->getWorldPos() + p->getVel()));
-                    //     }
-                    // }
-                    // p->addImpulse(backVel);
-
-                    // res[0] = checkCollisionLineWithCircle(p1, p2, p->getWorldPos() + p->getVel(), getRadius());
-
-                    // res[1] = checkCollisionLineWithCircle(p2, p3, p->getWorldPos() + p->getVel(), getRadius());
-
-                    // res[2] = checkCollisionLineWithCircle(p3, p4, p->getWorldPos() + p->getVel(), getRadius());
-
-                    // res[3] = checkCollisionLineWithCircle(p4, p1, p->getWorldPos() + p->getVel(), getRadius());
                 }
             }
         }
@@ -86,14 +56,14 @@ void ColliderCircle::collision()
 
 void ColliderRect::init()
 {
-    sf::Vector2f p1 = sf::Vector2f(0, 0);
-    sf::Vector2f p2 = sf::Vector2f(0, 0) + sf::Vector2f(getSize().x, 0);
-    sf::Vector2f p3 = sf::Vector2f(0, 0) + getSize();
-    sf::Vector2f p4 = sf::Vector2f(0, 0) + sf::Vector2f(0, getSize().y);
-    sides[0] = side{p1, p2};
-    sides[1] = side{p2, p3};
-    sides[2] = side{p3, p4};
-    sides[3] = side{p4, p1};
+    SMath::vec2f p1 = SMath::vec2f(0, 0);
+    SMath::vec2f p2 = SMath::vec2f(0, 0) + SMath::vec2f(getSize().x, 0);
+    SMath::vec2f p3 = SMath::vec2f(0, 0) + getSize();
+    SMath::vec2f p4 = SMath::vec2f(0, 0) + SMath::vec2f(0, getSize().y);
+    sides[0] = SMath::side{p1, p2};
+    sides[1] = SMath::side{p2, p3};
+    sides[2] = SMath::side{p3, p4};
+    sides[3] = SMath::side{p4, p1};
 }
 
 void ColliderRect::collision()
@@ -111,40 +81,50 @@ void ColliderRect::collision()
     }
 }
 
-side ColliderRect::getSide(int i)
+SMath::side ColliderRect::getSide(int i)
 {
     if (!getParent())
         return sides[i];
     return sides[i] + getParent()->getPos();
 }
 
-sf::Vector2f ColliderRect::getNormal(int i)
+vector<SMath::side> ColliderRect::getSides()
+{
+    vector<SMath::side> s;
+    for (int i = 0; i < 4; i++)
+    {
+        s.push_back(getSide(i));
+    }
+    return s;
+}
+
+SMath::vec2f ColliderRect::getNormal(int i)
 {
     if (i == 0)
     {
-        return sf::Vector2f(0, -1);
+        return SMath::vec2f(0, -1);
     }
     if (i == 1)
     {
-        return sf::Vector2f(1, 0);
+        return SMath::vec2f(1, 0);
     }
     if (i == 2)
     {
-        return sf::Vector2f(0, 1);
+        return SMath::vec2f(0, 1);
     }
     if (i == 3)
     {
-        return sf::Vector2f(-1, 0);
+        return SMath::vec2f(-1, 0);
     }
-    return sf::Vector2f(0, 0);
+    return SMath::vec2f(0, 0);
 }
 
-collisionLinesResult Collider::checkCollisionLines(sf::Vector2f s1, sf::Vector2f e1, sf::Vector2f s2, sf::Vector2f e2)
+collisionLinesResult Collider::checkCollisionLines(SMath::vec2f s1, SMath::vec2f e1, SMath::vec2f s2, SMath::vec2f e2)
 {
     collisionLinesResult result;
 
-    sf::Vector2f a = e1 - s1;
-    sf::Vector2f b = e2 - s2;
+    SMath::vec2f a = e1 - s1;
+    SMath::vec2f b = e2 - s2;
 
     if (a.x != 0 && b.x != 0)
     {
@@ -163,7 +143,7 @@ collisionLinesResult Collider::checkCollisionLines(sf::Vector2f s1, sf::Vector2f
         if (x >= min(s1.x, e1.x) && x <= max(s1.x, e1.x) && x >= min(s2.x, e2.x) && x <= max(s2.x, e2.x))
         {
             result.isColliding = true;
-            result.point = sf::Vector2f(x, y);
+            result.point = SMath::vec2f(x, y);
             return result;
         }
         result.isColliding = false;
@@ -180,7 +160,7 @@ collisionLinesResult Collider::checkCollisionLines(sf::Vector2f s1, sf::Vector2f
             if (y >= min(s1.y, e1.y) && y <= max(s1.y, e1.y) && x >= min(s2.x, e2.x) && x <= max(s2.x, e2.x))
             {
                 result.isColliding = true;
-                result.point = sf::Vector2f(x, y);
+                result.point = SMath::vec2f(x, y);
                 return result;
             }
         }
@@ -194,7 +174,7 @@ collisionLinesResult Collider::checkCollisionLines(sf::Vector2f s1, sf::Vector2f
             if (y >= min(s2.y, e2.y) && y <= max(s2.y, e2.y) && x >= min(s1.x, e1.x) && x <= max(s1.x, e1.x))
             {
                 result.isColliding = true;
-                result.point = sf::Vector2f(x, y);
+                result.point = SMath::vec2f(x, y);
                 return result;
             }
         }
@@ -207,8 +187,11 @@ collisionLinesResult Collider::checkCollisionLines(sf::Vector2f s1, sf::Vector2f
     result.isColliding = false;
     return result;
 }
-
-raycastResult Collider::raycast(sf::Vector2f s, sf::Vector2f e)
+raycastResult Collider::raycast(SMath::vec2f s, SMath::vec2f e)
+{
+    return raycast(s, e, nullptr);
+}
+raycastResult Collider::raycast(SMath::vec2f s, SMath::vec2f e, Object *ignore)
 {
     raycastResult result;
 
@@ -216,6 +199,8 @@ raycastResult Collider::raycast(sf::Vector2f s, sf::Vector2f e)
     {
 
         Object *obj = World::getObjectByIndex(i);
+        if (ignore && ignore == obj)
+            continue;
         if (obj->getColliderObject())
         {
             Collider *col;
@@ -230,10 +215,10 @@ raycastResult Collider::raycast(sf::Vector2f s, sf::Vector2f e)
 
                     ColliderRect *rect = dynamic_cast<ColliderRect *>(col);
 
-                    sf::Vector2f p1 = rect->getParent()->getPos();
-                    sf::Vector2f p2 = rect->getParent()->getPos() + sf::Vector2f(rect->getSize().x, 0);
-                    sf::Vector2f p3 = rect->getParent()->getPos() + rect->getSize();
-                    sf::Vector2f p4 = rect->getParent()->getPos() + sf::Vector2f(0, rect->getSize().y);
+                    SMath::vec2f p1 = rect->getParent()->getPos();
+                    SMath::vec2f p2 = rect->getParent()->getPos() + SMath::vec2f(rect->getSize().x, 0);
+                    SMath::vec2f p3 = rect->getParent()->getPos() + rect->getSize();
+                    SMath::vec2f p4 = rect->getParent()->getPos() + SMath::vec2f(0, rect->getSize().y);
 
                     collisionLinesResult res1 = checkCollisionLines(s, e, p1, p2);
 
@@ -277,21 +262,21 @@ raycastResult Collider::raycast(sf::Vector2f s, sf::Vector2f e)
     return result;
 }
 
-collisionCircleResult Collider::checkCollisionLineWithCircle(sf::Vector2f s1, sf::Vector2f e1, sf::Vector2f c, float r)
+collisionCircleResult Collider::checkCollisionLineWithCircle(SMath::vec2f s1, SMath::vec2f e1, SMath::vec2f c, float r)
 {
     collisionCircleResult result;
 
-    sf::Vector2f e2 = e1 - c;
-    sf::Vector2f s2 = s1 - c;
+    SMath::vec2f e2 = e1 - c;
+    SMath::vec2f s2 = s1 - c;
     if (e2.x - s2.x == 0)
     {
         if (abs(s2.x) > r)
         {
             float y = sqrt(r * r - s2.x * s2.x);
-            result.points.push_back(sf::Vector2f(s2.x, y) + c);
+            result.points.push_back(SMath::vec2f(s2.x, y) + c);
             if (y != 0)
             {
-                result.points.push_back(sf::Vector2f(s2.x, -y) + c);
+                result.points.push_back(SMath::vec2f(s2.x, -y) + c);
             }
             result.isColliding = false;
             return result;
@@ -321,17 +306,84 @@ collisionCircleResult Collider::checkCollisionLineWithCircle(sf::Vector2f s1, sf
     if (x1 >= min(s1.x, e1.x) && x1 <= max(s1.x, e1.x) && y1 >= min(s1.y, e1.y) && y1 <= max(s1.y, e1.y))
     {
         result.isColliding = true;
-        result.points.push_back(sf::Vector2f(x1, y1));
+        result.points.push_back(SMath::vec2f(x1, y1));
     }
     if (x2 >= min(s1.x, e1.x) && x2 <= max(s1.x, e1.x) && y2 >= min(s1.y, e1.y) && y2 <= max(s1.y, e1.y) && D != 0)
     {
         result.isColliding = true;
-        result.points.push_back(sf::Vector2f(x2, y2));
+        result.points.push_back(SMath::vec2f(x2, y2));
     }
     return result;
 }
 
-collisionCircleResult Collider::checkCollisionLineWithCircle(side s, sf::Vector2f c, float r)
+collisionCircleResult Collider::checkCollisionLineWithCircle(SMath::side s, SMath::vec2f c, float r)
 {
     return checkCollisionLineWithCircle(s.p1, s.p2, c, r);
+}
+
+SMath::vec2f Collider::getMTVPolyCircle(vector<SMath::side> sides, SMath::vec2f c, float r)
+{
+    SMath::vec2f m = sides[0].p1;
+    float md = SMath::length(c, sides[0].p1);
+
+    for (int i = 0; i < sides.size(); i++)
+    {
+        SMath::vec2f h;
+        float t = SMath::scalar((c - sides[i].p1), (sides[i].p2 - sides[i].p1)) / SMath::pov(SMath::length((sides[i])), 2);
+        if (t > 1)
+        {
+            h = sides[i].p2;
+        }
+        else if (t < 0)
+        {
+            h = sides[i].p1;
+        }
+        else
+        {
+            h = sides[i].p1 + (sides[i].p2 - sides[i].p1) * t;
+        }
+        float d = SMath::length(c, h);
+        if (d < md)
+        {
+            md = d;
+            m = h;
+        }
+    }
+    if (md <= r)
+    {
+        SMath::vec2f mtv = SMath::normalize(c - m) * (r - md);
+        return mtv;
+    }
+    return SMath::vec2f(0.f, 0.f);
+}
+
+SMath::vec2f Collider::getMTVPolyCircle(SMath::side s, SMath::vec2f c, float r)
+{
+    vector<SMath::side> v = {s};
+    return getMTVPolyCircle(v, c, r);
+}
+
+SMath::side ColliderLine::getSide()
+{
+    if (getParent())
+    {
+        return s + getParent()->getWorldPos();
+    }
+    return s;
+}
+SMath::vec2f ColliderLine::getPoint1()
+{
+    if (getParent())
+    {
+        return s.p1 + getParent()->getWorldPos();
+    }
+    return s.p1;
+}
+SMath::vec2f ColliderLine::getPoint2()
+{
+    if (getParent())
+    {
+        return s.p2 + getParent()->getWorldPos();
+    }
+    return s.p2;
 }

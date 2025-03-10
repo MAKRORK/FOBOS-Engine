@@ -4,12 +4,13 @@ project(Console)
 set(CMAKE_CXX_STANDARD 20)
 
 add_executable(main main.cpp code/Interfaces/Render.cpp 
-code/Objects/Entity/Player.cpp code/Objects/Object.cpp 
-code/Objects/Entity/Entity.cpp code/Objects/Entity/Enemies/Enemy.cpp
+code/Objects/Object.cpp code/Objects/Entity/Collider.cpp
+code/Objects/Entity/Entity.cpp code/Objects/Entity/Player.cpp
 code/Interfaces/World.cpp code/Interfaces/Input.cpp
 code/Interfaces/SMath.cpp code/Interfaces/Settings.cpp
 code/Objects/Blocks/Block.cpp code/Objects/Blocks/Wall.cpp
-code/Objects/Entity/Collider.cpp)
+code/Objects/Entity/Enemies/Enemy.cpp code/Visual/Shape.cpp
+code/Interfaces/ForSFML.cpp code/Visual/VisualStructs.cpp)
 
 include_directories(c:/SFML-2.6.2/include)
 

@@ -2,21 +2,20 @@
 #include "../../Interfaces/Input.h"
 #include "../../Interfaces/SMath.h"
 #include "../../Interfaces/Settings.h"
+#include "../../Interfaces/ForSFML.h"
 #include "Collider.h"
 #include <iostream>
 #include <array>
 
 void Player::render(sf::RenderWindow &window)
 {
-    shape.setPosition(getPos() - sf::Vector2f(10.f, 10.f));
-    window.draw(shape);
     std::array line =
         {
-            sf::Vertex{getWorldPos()},
-            sf::Vertex{getWorldPos() + getForwardVector() * 300.f}};
+            sf::Vertex{forSFML::toSFMLVector(getWorldPos())},
+            sf::Vertex{forSFML::toSFMLVector(getWorldPos() + getForwardVector() * 300.f)}};
     window.draw(line.data(), line.size(), sf::PrimitiveType::Lines);
 
-    raycastResult res = Collider::raycast(getWorldPos(), getWorldPos() + getForwardVector() * 300.f);
+    raycastResult res = Collider::raycast(getWorldPos(), getWorldPos() + getForwardVector() * 300.f, this);
     if (res.isColliding)
     {
 
@@ -26,7 +25,7 @@ void Player::render(sf::RenderWindow &window)
             {
                 sf::CircleShape shape(5.f);
                 shape.setFillColor(sf::Color::Red);
-                shape.setPosition(res.collidedObjects[i].points[j] - sf::Vector2f(5.f, 5.f));
+                shape.setPosition(forSFML::toSFMLVector(res.collidedObjects[i].points[j] - SMath::vec2f(5.f, 5.f)));
                 window.draw(shape);
             }
         }
@@ -35,7 +34,7 @@ void Player::render(sf::RenderWindow &window)
 
 void Player::movement(float delta)
 {
-    sf::Vector2f velMovement = sf::Vector2f(0.f, 0.f);
+    SMath::vec2f velMovement = SMath::vec2f(0.f, 0.f);
     if (Input::isPressed(sf::Keyboard::Key::W))
     {
         velMovement.y -= 1.f;
@@ -66,6 +65,4 @@ void Player::movement(float delta)
 void Player::init()
 {
     setColliding(true);
-    shape.setRadius(10.f);
-    shape.setFillColor(sf::Color::Green);
 }

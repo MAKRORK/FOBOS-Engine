@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Vector2.hpp>
+#include "../../Interfaces/SMath.h"
 #include "Entity.h"
 #include <iostream>
 
@@ -10,15 +11,15 @@ public:
     {
         init();
     }
-    Player(sf::Vector2f _pos) : Entity(_pos)
+    Player(SMath::vec2f _pos) : Entity(_pos)
     {
         init();
     }
-    void render(sf::RenderWindow &window) override;
+    void render(sf::RenderWindow &window);
+    void update() override {}
     void movement(float delta);
 
 private:
-    sf::CircleShape shape;
     float speed = 200.f;
     void init();
 };

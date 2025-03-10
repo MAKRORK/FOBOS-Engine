@@ -9,7 +9,7 @@ void Entity::physics(float delta)
         col->collision();
     }
     addPos(vel);
-    vel = sf::Vector2f(0.f, 0.f);
+    vel = SMath::vec2f(0.f, 0.f);
 }
 
 void Entity::setColliding(bool _isColliding)
@@ -22,12 +22,12 @@ bool Entity::getColliding()
     return isColliding;
 }
 
-sf::Vector2f Entity::getVel()
+SMath::vec2f Entity::getVel()
 {
     return vel;
 }
 
-void Entity::addImpulse(sf::Vector2f impulse)
+void Entity::addImpulse(SMath::vec2f impulse)
 {
     vel += impulse;
 }

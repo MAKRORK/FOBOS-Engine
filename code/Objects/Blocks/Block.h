@@ -1,11 +1,11 @@
 #pragma once
 #include "../Object.h"
+#include "../../Interfaces/SMath.h"
 
 class Block : public Object
 {
 private:
 public:
-    void render();
     Block() : Object() {}
-    Block(sf::Vector2f _pos) : Object(_pos) {}
+    Block(SMath::vec2f _pos) : Object(_pos) {}
 };
