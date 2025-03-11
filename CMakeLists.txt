@@ -10,7 +10,8 @@ code/Interfaces/World.cpp code/Interfaces/Input.cpp
 code/Interfaces/SMath.cpp code/Interfaces/Settings.cpp
 code/Objects/Blocks/Block.cpp code/Objects/Blocks/Wall.cpp
 code/Objects/Entity/Enemies/Enemy.cpp code/Visual/Shape.cpp
-code/Interfaces/ForSFML.cpp code/Visual/VisualStructs.cpp)
+code/Interfaces/ForSFML.cpp code/Visual/VisualStructs.cpp
+code/Objects/Camers/Camera2D.cpp code/Objects/Camers/Camera.cpp)
 
 include_directories(c:/SFML-2.6.2/include)
 

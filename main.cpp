@@ -10,6 +10,8 @@
 #include "code/Interfaces/SMath.h"
 #include "code/Objects/Entity/Collider.h"
 #include "code/Visual/Shape.h"
+#include "code/Objects/Camers/Camera2D.h"
+#include "code/Interfaces/Input.h"
 
 #include <array>
 
@@ -20,24 +22,29 @@ int main()
     sf::RenderWindow window(sf::VideoMode(Settings::width, Settings::height), "Huita");
 
     World::setMap();
-
+    Render::init(&window);
+    Input::init();
     Player player(SMath::vec2f(320.f + 34.f, 78.f + 34.f));
-    player.addChildren(new Circle(10.f, fv::Color::green));
+    player.addChildren(new Circle(10.f, fv::Color::white));
     World::addObject(&player);
+    Camera2D *cam = new Camera2D(SMath::vec2f(0.f), SMath::vec2(480, 320));
+    cam->NewRenderContext();
+    cam->setBackgroundColor(fv::Color(76, 230, 114));
+    cam->setScreenPos(SMath::vec2f(Settings::width - 480.f, Settings::height - 320.f));
+    player.addChildren(cam);
+    World::setMainCamera(cam);
     Enemy enemy(SMath::vec2f(248.f, 78.f));
     enemy.addChildren(new Circle(15.f, fv::Color::blue));
     enemy.addChildren(new ColliderCircle(15.f));
     player.addChildren(new ColliderCircle(10.f));
     World::addObject(&enemy);
 
+    // Input::setMouseCentered(true);
+
     sf::Clock clock;
     sf::Time prevTime = clock.getElapsedTime();
     sf::Time currentTime = sf::seconds(0);
     float delta = 0;
-
-    Render::init(&window);
-    SMath::vec2f f = 2.f * SMath::vec2f(1, 2);
-    std::cout << f.x << "  " << f.y << "\n";
 
     while (window.isOpen())
     {
@@ -46,6 +53,10 @@ int main()
         {
             if (event.type == sf::Event::Closed)
                 window.close();
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
+            {
+                window.close();
+            }
         }
 
         currentTime = clock.getElapsedTime();
@@ -60,17 +71,18 @@ int main()
         }
         prevTime = currentTime;
 
-        window.clear();
+        Input::update();
+
+        Render::clearAllContext();
         player.movement(delta);
         player.physics(delta);
 
-        Render::renderAllShapes();
-        player.render(window);
+        player.update();
+        cam->render();
         if (Settings::showFpsCounter)
         {
             Render::renderFpsCounter(delta);
         }
-
         window.display();
     }
 

@@ -8,6 +8,7 @@ string *World::map;
 int World::mapWidth = 20;
 int World::mapHeight = 12;
 int **World::mapBlocks;
+Camera *World::mainCamera = nullptr;
 
 void World::setMap()
 {
@@ -49,6 +50,16 @@ int World::getMapWidth()
 int World::getMapHeight()
 {
     return mapHeight;
+}
+
+Camera *World::getMainCamera()
+{
+    return mainCamera;
+}
+
+void World::setMainCamera(Camera *cam)
+{
+    mainCamera = cam;
 }
 
 int World::addObject(Object *obj)

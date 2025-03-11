@@ -42,6 +42,10 @@ float SMath::pov(float a, int p)
     }
     return ans;
 }
+SMath::side SMath::scaledSide(side s, float sc)
+{
+    return side(s.p1 * sc, s.p2 * sc);
+}
 float SMath::distToLine(SMath::vec2f p1, SMath::vec2f p2, SMath::vec2f p)
 {
     float a = SMath::length(p1, p);
@@ -51,7 +55,7 @@ float SMath::distToLine(SMath::vec2f p1, SMath::vec2f p2, SMath::vec2f p)
     float S = sqrt(p_ * (p_ - a) * (p_ - b) * (p_ - c));
     return 2 * S / c;
 }
-// float SMath::distToLine(side s, SMath::vec2f p)
-// {
-//     return SMath::distToLine(s.p1, s.p2, p);
-// }
+float SMath::distToLine(side s, SMath::vec2f p)
+{
+    return SMath::distToLine(s.p1, s.p2, p);
+}

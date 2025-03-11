@@ -1,6 +1,4 @@
 #pragma once
-#include <SFML/Graphics.hpp>
-#include <SFML/System/Vector2.hpp>
 #include "../Interfaces/SMath.h"
 #include <vector>
 #include <iostream>
@@ -10,6 +8,7 @@ class Object
 public:
     Object();
     Object(SMath::vec2f _pos);
+    virtual ~Object();
     virtual void update() {}
 
     void setPos(SMath::vec2f _pos);

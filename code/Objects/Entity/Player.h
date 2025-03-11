@@ -1,5 +1,4 @@
-#include <SFML/Graphics.hpp>
-#include <SFML/System/Vector2.hpp>
+#include "../Camers/Camera.h"
 #include "../../Interfaces/SMath.h"
 #include "Entity.h"
 #include <iostream>
@@ -15,8 +14,7 @@ public:
     {
         init();
     }
-    void render(sf::RenderWindow &window);
-    void update() override {}
+    void update() override;
     void movement(float delta);
 
 private:

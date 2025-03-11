@@ -1,7 +1,5 @@
 #pragma once
 #include "../Entity.h"
-#include <SFML/Graphics.hpp>
-#include <SFML/System/Vector2.hpp>
 
 class Enemy : public Entity
 {

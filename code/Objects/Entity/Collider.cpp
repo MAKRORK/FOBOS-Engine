@@ -1,6 +1,6 @@
 #include "Collider.h"
 #include "../../Interfaces/World.h"
-
+#include "../../Interfaces/Render.h"
 #include "Entity.h"
 #include <cmath>
 
@@ -191,7 +191,7 @@ raycastResult Collider::raycast(SMath::vec2f s, SMath::vec2f e)
 {
     return raycast(s, e, nullptr);
 }
-raycastResult Collider::raycast(SMath::vec2f s, SMath::vec2f e, Object *ignore)
+raycastResult Collider::raycast(SMath::vec2f s, SMath::vec2f e, Object *ignore, bool draw, Camera *cam)
 {
     raycastResult result;
 
@@ -255,6 +255,30 @@ raycastResult Collider::raycast(SMath::vec2f s, SMath::vec2f e, Object *ignore)
                         result.isColliding = true;
                         result.collidedObjects.push_back(colObj);
                     }
+                }
+            }
+        }
+    }
+    if (!cam)
+    {
+        cam = World::getMainCamera();
+    }
+    if (draw && cam)
+    {
+        Line *l = new Line(SMath::side(s, e));
+        l->setColor(fv::Color::red);
+        cam->addToRender(l);
+        if (result.isColliding)
+        {
+
+            for (int i = 0; i < result.collidedObjects.size(); i++)
+            {
+                for (int j = 0; j < result.collidedObjects[i].points.size(); j++)
+                {
+                    Circle *c = new Circle(5.f);
+                    c->setColor(fv::Color::red);
+                    c->setPos(result.collidedObjects[i].points[j]);
+                    cam->addToRender(c);
                 }
             }
         }

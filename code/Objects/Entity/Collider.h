@@ -1,9 +1,9 @@
 #pragma once
-#include "SFML/System/Vector2.hpp"
 #include "../Object.h"
 #include <vector>
 #include <iostream>
 #include "../../Interfaces/SMath.h"
+#include "../Camers/Camera.h"
 
 // Ensure SMath namespace and vec2f type are defined
 
@@ -49,7 +49,8 @@ public:
 
     static collisionLinesResult checkCollisionLines(SMath::vec2f s1, SMath::vec2f e1, SMath::vec2f s2, SMath::vec2f e2);
     static raycastResult raycast(SMath::vec2f s, SMath::vec2f e);
-    static raycastResult raycast(SMath::vec2f s, SMath::vec2f e, Object *ignore);
+    static raycastResult raycast(SMath::vec2f s, SMath::vec2f e, Object *ignore, bool draw = false, Camera *cam = nullptr);
+
     static collisionCircleResult checkCollisionLineWithCircle(SMath::vec2f s1, SMath::vec2f e1, SMath::vec2f c, float r);
     static collisionCircleResult checkCollisionLineWithCircle(SMath::side s, SMath::vec2f c, float r);
     static SMath::vec2f getMTVPolyCircle(vector<SMath::side> sides, SMath::vec2f c, float r);

@@ -15,6 +15,15 @@ Object::Object(SMath::vec2f _pos)
     rot = 0.f;
 }
 
+Object::~Object()
+{
+    for (Object *child : childrens)
+    {
+        delete child;
+    }
+    childrens.clear();
+}
+
 void Object::setPos(SMath::vec2f _pos)
 {
     pos = _pos;

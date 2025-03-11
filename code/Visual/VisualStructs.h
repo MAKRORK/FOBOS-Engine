@@ -32,4 +32,13 @@ namespace fv
         float scale;
     };
 
+    struct renderContext
+    {
+        int context = 0;
+        fv::context offContext = fv::context();
+        renderContext() {}
+        renderContext(int _c) : context(_c) {}
+        renderContext(int _c, fv::context _oc) : context(_c), offContext(_oc) {}
+    };
+
 };

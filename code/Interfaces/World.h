@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
+#include "../Objects/Camers/Camera.h"
 
 using namespace std;
 
@@ -16,6 +17,8 @@ public:
     static void setMap();
     static int getMapWidth();
     static int getMapHeight();
+    static Camera *getMainCamera();
+    static void setMainCamera(Camera *cam);
 
 private:
     static std::vector<Object *> objects;
@@ -23,4 +26,5 @@ private:
     static int mapWidth;
     static int mapHeight;
     static int **mapBlocks;
+    static Camera *mainCamera;
 };

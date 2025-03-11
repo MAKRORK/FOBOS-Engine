@@ -7,5 +7,7 @@
 namespace forSFML
 {
     sf::Vector2f toSFMLVector(SMath::vec2f v);
+    sf::Vector2i toSFMLVectorI(SMath::vec2 v);
     sf::Color toSFMLColor(fv::Color c);
+    SMath::vec2 fromSFMLVectorI(sf::Vector2i v);
 };

@@ -7,29 +7,9 @@
 #include <iostream>
 #include <array>
 
-void Player::render(sf::RenderWindow &window)
+void Player::update()
 {
-    std::array line =
-        {
-            sf::Vertex{forSFML::toSFMLVector(getWorldPos())},
-            sf::Vertex{forSFML::toSFMLVector(getWorldPos() + getForwardVector() * 300.f)}};
-    window.draw(line.data(), line.size(), sf::PrimitiveType::Lines);
-
-    raycastResult res = Collider::raycast(getWorldPos(), getWorldPos() + getForwardVector() * 300.f, this);
-    if (res.isColliding)
-    {
-
-        for (int i = 0; i < res.collidedObjects.size(); i++)
-        {
-            for (int j = 0; j < res.collidedObjects[i].points.size(); j++)
-            {
-                sf::CircleShape shape(5.f);
-                shape.setFillColor(sf::Color::Red);
-                shape.setPosition(forSFML::toSFMLVector(res.collidedObjects[i].points[j] - SMath::vec2f(5.f, 5.f)));
-                window.draw(shape);
-            }
-        }
-    }
+    raycastResult res = Collider::raycast(getWorldPos(), getWorldPos() + getForwardVector() * 300.f, this, true);
 }
 
 void Player::movement(float delta)
