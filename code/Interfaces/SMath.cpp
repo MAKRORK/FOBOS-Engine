@@ -46,6 +46,34 @@ SMath::side SMath::scaledSide(side s, float sc)
 {
     return side(s.p1 * sc, s.p2 * sc);
 }
+SMath::vec2f SMath::getVectorFromAngle(float a)
+{
+    return SMath::vec2f(cosf(a), sinf(a));
+}
+float SMath::ang2rad(float a)
+{
+    return a / 180.f * pi;
+}
+float SMath::rad2ang(float r)
+{
+    return r * 180.f / pi;
+}
+float SMath::sqrLength(SMath::vec2f p)
+{
+    return p.x * p.x + p.y * p.y;
+}
+float SMath::sqrLength(SMath::vec2f p1, SMath::vec2f p2)
+{
+    return sqrLength(p2 - p1);
+}
+float SMath::clamp(float a, float mn, float mx)
+{
+    if (a < mn)
+        return mn;
+    if (a > mx)
+        return mx;
+    return a;
+}
 float SMath::distToLine(SMath::vec2f p1, SMath::vec2f p2, SMath::vec2f p)
 {
     float a = SMath::length(p1, p);
@@ -58,4 +86,10 @@ float SMath::distToLine(SMath::vec2f p1, SMath::vec2f p2, SMath::vec2f p)
 float SMath::distToLine(side s, SMath::vec2f p)
 {
     return SMath::distToLine(s.p1, s.p2, p);
+}
+
+std::ostream &operator<<(std::ostream &os, const SMath::vec2f &p)
+{
+    os << "(" << p.x << ", " << p.y << ")";
+    return os;
 }

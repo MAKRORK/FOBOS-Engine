@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 
 namespace SMath
 {
@@ -22,6 +23,7 @@ namespace SMath
         vec2 operator-(int b) const { return vec2(x - b, y - b); }
         vec2 operator*(int b) const { return vec2(x * b, y * b); }
         vec2 operator/(int b) const { return vec2(x / b, y / b); }
+        vec2 operator-() const { return vec2(-x, -y); }
     };
     struct vec2f
     {
@@ -62,6 +64,7 @@ namespace SMath
         vec2f operator-(float b) const { return vec2f(x - b, y - b); }
         vec2f operator*(float b) const { return vec2f(x * b, y * b); }
         vec2f operator/(float b) const { return vec2f(x / b, y / b); }
+        vec2f operator-() const { return vec2f(-x, -y); }
     };
 
     vec2f operator*(float a, const vec2f &v);
@@ -87,4 +90,13 @@ namespace SMath
     float scalar(SMath::vec2f a, SMath::vec2f b);
     float pov(float a, int p);
     side scaledSide(side s, float sc);
+    vec2f getVectorFromAngle(float a);
+    float ang2rad(float a);
+    float rad2ang(float r);
+    const float pi = 3.1415926;
+    float sqrLength(SMath::vec2f p);
+    float sqrLength(SMath::vec2f p1, SMath::vec2f p2);
+    float clamp(float a, float mn, float mx);
 }
+
+std::ostream &operator<<(std::ostream &os, const SMath::vec2f &p);

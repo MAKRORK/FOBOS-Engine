@@ -12,4 +12,5 @@ public:
     Camera2D(SMath::vec2f _pos, SMath::vec2 _size) : Camera(_pos, _size) {}
 
     void render() override;
+    void renderBuffer() override;
 };

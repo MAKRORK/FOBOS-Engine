@@ -4,14 +4,20 @@ project(Console)
 set(CMAKE_CXX_STANDARD 20)
 
 add_executable(main main.cpp code/Interfaces/Render.cpp 
-code/Objects/Object.cpp code/Objects/Entity/Collider.cpp
+code/Objects/Object.cpp code/Objects/Entity/Colliders/Collider.cpp
 code/Objects/Entity/Entity.cpp code/Objects/Entity/Player.cpp
 code/Interfaces/World.cpp code/Interfaces/Input.cpp
 code/Interfaces/SMath.cpp code/Interfaces/Settings.cpp
 code/Objects/Blocks/Block.cpp code/Objects/Blocks/Wall.cpp
 code/Objects/Entity/Enemies/Enemy.cpp code/Visual/Shape.cpp
 code/Interfaces/ForSFML.cpp code/Visual/VisualStructs.cpp
-code/Objects/Camers/Camera2D.cpp code/Objects/Camers/Camera.cpp)
+code/Objects/Camers/Camera2D.cpp code/Objects/Camers/Camera.cpp
+code/Global.cpp code/Objects/Camers/CameraR3D.cpp
+code/Interfaces/Loger.cpp code/Algoritms/GeometryAlgoritms.cpp
+code/Objects/Entity/Colliders/ColliderPolygon.cpp 
+code/Objects/Entity/Colliders/BVH.cpp code/Objects/Entity/Colliders/ColliderRect.cpp
+code/Primitives/Primitives2D.cpp code/Objects/Entity/Colliders/ColliderCircle.cpp
+code/Objects/Entity/Colliders/ColliderLine.cpp)
 
 include_directories(c:/SFML-2.6.2/include)
 

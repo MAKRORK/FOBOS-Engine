@@ -34,7 +34,7 @@ void World::setMap()
             if (map[i][j] == '#')
             {
                 int t = addObject(new Wall(SMath::vec2f(j * 32, i * 32)));
-                Rect *r = new Rect(SMath::vec2f(32.f, 32.f));
+                RectShape *r = new RectShape(SMath::vec2f(32.f, 32.f));
                 r->setColor(fv::Color::white);
                 getObjectByIndex(t)->addChildren(r);
             }
@@ -60,6 +60,15 @@ Camera *World::getMainCamera()
 void World::setMainCamera(Camera *cam)
 {
     mainCamera = cam;
+}
+
+void World::clear()
+{
+    for (int i = 0; i < objects.size(); i++)
+    {
+        delete objects[i];
+    }
+    objects.clear();
 }
 
 int World::addObject(Object *obj)

@@ -3,13 +3,14 @@
 #include "../../Interfaces/SMath.h"
 #include "../../Interfaces/Settings.h"
 #include "../../Interfaces/ForSFML.h"
-#include "Collider.h"
+#include "../../Global.h"
+#include "Colliders/Collider.h"
 #include <iostream>
 #include <array>
 
 void Player::update()
 {
-    raycastResult res = Collider::raycast(getWorldPos(), getWorldPos() + getForwardVector() * 300.f, this, true);
+    raycastResult res = Collider::raycast(getWorldPos(), getWorldPos() + getForwardVector() * 300.f, this, true, Global::miniMapCam);
 }
 
 void Player::movement(float delta)

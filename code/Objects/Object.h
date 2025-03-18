@@ -25,7 +25,7 @@ public:
     SMath::vec2f getWorldPos();
     float getWorldRot();
 
-    int addChildren(Object *child);
+    virtual int addChildren(Object *child);
 
     void setParent(Object *_parent);
     Object *getParent();

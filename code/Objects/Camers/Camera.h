@@ -48,4 +48,6 @@ public:
     fv::Color getBackgroundColor() { return backgroundColor; }
 
     virtual void render() {}
+
+    virtual void renderBuffer() {}
 };

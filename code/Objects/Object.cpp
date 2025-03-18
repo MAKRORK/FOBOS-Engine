@@ -1,5 +1,5 @@
 #include "Object.h"
-#include "Entity/Collider.h"
+#include "Entity/Colliders/Collider.h"
 #include "../Visual/Shape.h"
 #include <cmath>
 
@@ -143,5 +143,5 @@ vector<Object *> Object::getShapes()
 
 SMath::vec2f Object::getForwardVector()
 {
-    return SMath::vec2f(cosf(getWorldRot()), sinf(getWorldRot()));
+    return SMath::getVectorFromAngle(getWorldRot());
 }

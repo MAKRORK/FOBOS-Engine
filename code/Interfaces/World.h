@@ -19,6 +19,7 @@ public:
     static int getMapHeight();
     static Camera *getMainCamera();
     static void setMainCamera(Camera *cam);
+    static void clear();
 
 private:
     static std::vector<Object *> objects;

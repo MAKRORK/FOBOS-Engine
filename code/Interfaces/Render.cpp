@@ -4,6 +4,7 @@
 #include "ForSFML.h"
 #include <iostream>
 #include <array>
+#include "Loger.h"
 
 sf::Font Render::pixOp;
 sf::Text Render::fpsCounter;
@@ -14,6 +15,7 @@ vector<fv::Color> Render::backgroundColors;
 void Render::renderFpsCounter(float d)
 {
     float fps = 1.f / d;
+    Loger::updateFpsRep(fps);
     fpsCounter.setString(to_string((int)fps));
     (*window).draw(fpsCounter);
 }
@@ -22,7 +24,7 @@ void Render::render(Shape *s)
 {
 }
 
-void Render::render(Circle *c, fv::context cont, int context)
+void Render::render(CircleShape *c, fv::context cont, int context)
 {
     sf::CircleShape sc(c->getScaleRadius() * cont.scale);
     SMath::vec2f p = ((c->getWorldPos() + cont.offset) * c->getScale() * cont.scale) - c->getScaleRadius() * cont.scale;
@@ -41,7 +43,7 @@ void Render::render(Circle *c, fv::context cont, int context)
     }
 }
 
-void Render::render(Rect *r, fv::context cont, int context)
+void Render::render(RectShape *r, fv::context cont, int context)
 {
     sf::RectangleShape rs(forSFML::toSFMLVector(r->getScaleSize() * cont.scale));
     SMath::vec2f p = (r->getWorldPos() + cont.offset) * r->getScale() * cont.scale;
@@ -61,12 +63,12 @@ void Render::render(Rect *r, fv::context cont, int context)
     }
 }
 
-void Render::render(Rect *r, int context)
+void Render::render(RectShape *r, int context)
 {
     render(r, fv::context(0.f, 1.f), context);
 }
 
-void Render::render(Line *l, fv::context cont, int context)
+void Render::render(LineShape *l, fv::context cont, int context)
 {
     SMath::side pl = SMath::scaledSide(l->getScaleLine(), cont.scale) + (l->getWorldPos() + cont.offset) * l->getScale() * cont.scale;
     if (context)
@@ -85,9 +87,37 @@ void Render::render(Line *l, fv::context cont, int context)
     }
 }
 
-void Render::render(Line *l, int context)
+void Render::render(LineShape *l, int context)
 {
     render(l, fv::context(0.f, 1.f), context);
+}
+
+void Render::render(PolygonShape *p, int context)
+{
+    render(p, fv::context(0.f, 1.f), context);
+}
+
+void Render::render(PolygonShape *p, fv::context cont, int context)
+{
+    sf::ConvexShape polygon;
+    polygon.setFillColor(forSFML::toSFMLColor(p->getColor()));
+    polygon.setPointCount(p->getSize());
+    for (int i = 0; i < p->getSize(); i++)
+    {
+        SMath::vec2f point = p->getScaledPoint(i) * cont.scale + (p->getWorldPos() + cont.offset) * p->getScale() * cont.scale;
+
+        if (context)
+        {
+            point.y = contexts[context - 1]->getSize().y - point.y;
+        }
+        polygon.setPoint(i, forSFML::toSFMLVector(point));
+    }
+    if (context == 0)
+        window->draw(polygon);
+    else
+    {
+        contexts[context - 1]->draw(polygon);
+    }
 }
 
 void Render::renderAllShapes(fv::renderContext c)
@@ -174,7 +204,7 @@ SMath::vec2 Render::getWindowSize()
     return SMath::vec2(Settings::width, Settings::height);
 }
 
-void Render::render(Circle *c, int context)
+void Render::render(CircleShape *c, int context)
 {
     render(c, fv::context(0.f, 1.f), context);
 }

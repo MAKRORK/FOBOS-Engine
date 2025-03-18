@@ -15,14 +15,17 @@ public:
 
     static void render(Shape *s);
 
-    static void render(Circle *c, int context = 0);
-    static void render(Circle *c, fv::context cont, int context = 0);
+    static void render(CircleShape *c, int context = 0);
+    static void render(CircleShape *c, fv::context cont, int context = 0);
 
-    static void render(Rect *r, int context = 0);
-    static void render(Rect *r, fv::context cont, int context = 0);
+    static void render(RectShape *r, int context = 0);
+    static void render(RectShape *r, fv::context cont, int context = 0);
 
-    static void render(Line *l, int context = 0);
-    static void render(Line *l, fv::context cont, int context = 0);
+    static void render(LineShape *l, int context = 0);
+    static void render(LineShape *l, fv::context cont, int context = 0);
+
+    static void render(PolygonShape *p, int context = 0);
+    static void render(PolygonShape *p, fv::context cont, int context = 0);
 
     static void renderAllShapes(fv::renderContext c = fv::renderContext());
     static void renderShapes(vector<Shape *> vec, fv::renderContext c = fv::renderContext());

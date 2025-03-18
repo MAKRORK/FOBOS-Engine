@@ -1,8 +1,9 @@
 #include "Wall.h"
 #include <iostream>
-#include "../Entity/Collider.h"
+#include "../Entity/Colliders/Collider.h"
 #include "../../Interfaces/ForSFML.h"
 #include "../../Visual/Shape.h"
+#include "../Entity/Colliders/ColliderRect.h"
 
 void Wall::init()
 {

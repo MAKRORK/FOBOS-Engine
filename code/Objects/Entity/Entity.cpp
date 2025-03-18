@@ -1,5 +1,5 @@
 #include "Entity.h"
-#include "Collider.h"
+#include "Colliders/Collider.h"
 
 void Entity::physics(float delta)
 {
