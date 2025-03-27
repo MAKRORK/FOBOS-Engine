@@ -26,6 +26,7 @@ public:
     float getWorldRot();
 
     virtual int addChildren(Object *child);
+    void replaceChildren(Object *child, Object *new_child);
 
     void setParent(Object *_parent);
     Object *getParent();
@@ -39,6 +40,7 @@ public:
     std::vector<Object *> getShapes();
 
     SMath::vec2f getForwardVector();
+    SMath::vec2f getRightVector();
 
 private:
     Object *collider = nullptr;

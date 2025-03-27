@@ -21,6 +21,8 @@ public:
     static void setMainCamera(Camera *cam);
     static void clear();
 
+    static void removeObject(Object *obj);
+
 private:
     static std::vector<Object *> objects;
     static string *map;

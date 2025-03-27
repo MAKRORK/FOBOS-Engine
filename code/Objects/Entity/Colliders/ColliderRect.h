@@ -30,5 +30,5 @@ public:
 
     SMath::side getSide(int i);
     vector<SMath::side> getSides();
-    SMath::vec2f getNormal(int i);
+    SMath::vec2f getNormal(int i) override;
 };

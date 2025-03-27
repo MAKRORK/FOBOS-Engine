@@ -17,6 +17,14 @@ fv::Color::Color()
     a = 255;
 }
 
+fv::Color::Color(uint8 _c)
+{
+    r = _c;
+    g = _c;
+    b = _c;
+    a = 255;
+}
+
 fv::Color::Color(uint8 _r, uint8 _g, uint8 _b)
 {
     r = _r;

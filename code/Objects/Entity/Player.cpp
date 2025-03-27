@@ -18,28 +18,30 @@ void Player::movement(float delta)
     SMath::vec2f velMovement = SMath::vec2f(0.f, 0.f);
     if (Input::isPressed(sf::Keyboard::Key::W))
     {
-        velMovement.y -= 1.f;
+        velMovement += getForwardVector();
     }
     if (Input::isPressed(sf::Keyboard::Key::S))
     {
-        velMovement.y += 1.f;
+        velMovement -= getForwardVector();
     }
     if (Input::isPressed(sf::Keyboard::Key::A))
     {
-        velMovement.x -= 1.f;
+        velMovement += getRightVector();
     }
     if (Input::isPressed(sf::Keyboard::Key::D))
     {
-        velMovement.x += 1.f;
+        velMovement -= getRightVector();
     }
     if (Input::isPressed(sf::Keyboard::Key::Left))
     {
-        addRot(-1.f * delta * Settings::sensitivity);
+        addRot(-7.f * delta * Settings::sensitivity);
     }
     if (Input::isPressed(sf::Keyboard::Key::Right))
     {
-        addRot(1.f * delta * Settings::sensitivity);
+        addRot(7.f * delta * Settings::sensitivity);
     }
+    addRot(Input::getMouseDelta().x * delta * Settings::sensitivity);
+    // cout << Input::getMouseDelta().x << "\n";
     vel += SMath::normalize(velMovement) * speed * delta;
 }
 

@@ -7,6 +7,11 @@
 
 using namespace std;
 
+enum ResourseType
+{
+    Texture,
+};
+
 class Render
 {
 public:
@@ -40,14 +45,23 @@ public:
 
     static void renderContext(SMath::vec2f pos, int c);
 
+    static int addResourse(const char *path, ResourseType type, const char *name);
+
     static SMath::vec2 getWindowCord(SMath::vec2 p = SMath::vec2());
     static SMath::vec2 getWindowSize();
+    static sf::Texture *getTextureByIndex(int id);
+    static int getTextureIndexByName(std::string name);
+    static void setMouseVisible(bool t);
 
-private:
+protected:
     static sf::RenderWindow *window;
     static vector<sf::RenderTexture *> contexts;
     static vector<fv::Color> backgroundColors;
+
+private:
     static sf::Font pixOp;
     static sf::Text fpsCounter;
+    static vector<sf::Texture *> textures;
+    static vector<std::string> textureNames;
     static void initFpsCounter();
 };

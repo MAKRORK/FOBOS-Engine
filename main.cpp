@@ -15,9 +15,11 @@
 #include "code/Visual/Shape.h"
 #include "code/Objects/Camers/Camera2D.h"
 #include "code/Objects/Camers/CameraR3D.h"
+#include "code/Objects/Camers/CameraQ3D.h"
 #include "code/Interfaces/Input.h"
 #include "code/Global.h"
 #include "code/Algoritms/GeometryAlgoritms.h"
+#include "code/Objects/R3DObjects/Wall.h"
 
 #include <array>
 
@@ -26,20 +28,23 @@ using namespace std;
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(Settings::width, Settings::height), "Huita");
+    Render::init(&window);
+    Render::addResourse("C:\\Users\\user\\Desktop\\Things\\Projects\\ConsoleTesting\\assets\\img\\WallTextures\\2.png", ResourseType::Texture, "wall1");
+    Render::addResourse("C:\\Users\\user\\Desktop\\Things\\Projects\\ConsoleTesting\\assets\\img\\WallTextures\\3.png", ResourseType::Texture, "wall2");
 
     World::setMap();
-    Render::init(&window);
+
     Input::init();
     Player player(SMath::vec2f(320.f + 34.f, 78.f + 34.f));
     player.addChildren(new CircleShape(10.f, fv::Color::white));
     World::addObject(&player);
 
-    Global::miniMapCam = new Camera2D(SMath::vec2f(0.f), SMath::vec2(760, 640));
+    Global::miniMapCam = new Camera2D(SMath::vec2f(0.f), SMath::vec2(360, 300));
     Global::miniMapCam->NewRenderContext();
     Global::miniMapCam->setBackgroundColor(fv::Color(76, 230, 114));
-    Global::miniMapCam->setScreenPos(SMath::vec2f(Settings::width - 760.f, Settings::height - 640.f));
+    Global::miniMapCam->setScreenPos(SMath::vec2f(Settings::width - 360.f, Settings::height - 300.f));
 
-    Camera *cam = new CameraR3D();
+    Camera *cam = new CameraR3D(SMath::vec2(Settings::width, Settings::height));
     cam->setBackgroundColor(fv::Color::black);
 
     player.addChildren(cam);
@@ -48,38 +53,36 @@ int main()
 
     World::setMainCamera(cam);
 
-    Enemy enemy(SMath::vec2f(248.f, 78.f));
-    enemy.addChildren(new CircleShape(15.f, fv::Color::blue));
-    enemy.addChildren(new ColliderCircle(15.f));
-    player.addChildren(new ColliderCircle(10.f));
-    World::addObject(&enemy);
+    Collider *cccc = new ColliderCircle(10.f);
 
-    // Input::setMouseCentered(true);
-    Object *o = new Object();
-    PolygonShape *pol = new PolygonShape(5);
-    pol->setPoint(0, SMath::vec2f(0.f));
-    pol->setPoint(1, SMath::vec2f(30.f, 10.f));
-    pol->setPoint(2, SMath::vec2f(40.f));
-    pol->setPoint(3, SMath::vec2f(10.f, 80.f));
-    pol->setPoint(4, SMath::vec2f(0.f, 40.f));
-    pol->setColor(fv::Color::yellow);
-    o->setPos(SMath::vec2f(500.f, 250.f));
+    player.addChildren(cccc);
+    // World::addObject(&enemy);
 
-    ColliderPolygon *cpol = new ColliderPolygon(5);
-    cpol->setPoint(0, SMath::vec2f(0.f));
-    cpol->setPoint(1, SMath::vec2f(30.f, 10.f));
-    cpol->setPoint(2, SMath::vec2f(40.f));
-    cpol->setPoint(3, SMath::vec2f(10.f, 80.f));
-    cpol->setPoint(4, SMath::vec2f(0.f, 40.f));
-    o->addChildren(pol);
-    o->addChildren(cpol);
-    World::addObject(o);
+    Input::setMouseCentered(true);
+    Render::setMouseVisible(false);
+    Wall *w = new Wall();
+    w->setSize(5);
+
+    w->setPoint(0, SMath::vec2f(0.f));
+    w->setPoint(1, SMath::vec2f(30.f, 10.f));
+    w->setPoint(2, SMath::vec2f(40.f));
+    w->setPoint(3, SMath::vec2f(10.f, 80.f));
+    w->setPoint(4, SMath::vec2f(0.f, 40.f));
+    w->create();
+
+    w->setPos(SMath::vec2f(500.f, 250.f));
+    w->setTextureForAllByName("wall2");
+    w->setTextureByName(1, "wall1");
+    World::addObject(w);
 
     sf::Clock clock;
     sf::Time prevTime = clock.getElapsedTime();
     sf::Time currentTime = sf::seconds(0);
     float delta = 0;
     Collider::createBVH();
+
+    cccc->setIsDynamic(true);
+
     while (window.isOpen())
     {
         sf::Event event;
@@ -96,12 +99,15 @@ int main()
         Input::update();
 
         Render::clearAllContext();
+
         player.movement(delta);
+
         player.physics(delta);
 
         player.update();
-        Global::miniMapCam->render();
         cam->render();
+        Global::miniMapCam->render();
+
         currentTime = clock.getElapsedTime();
         delta = (currentTime - prevTime).asSeconds();
         if (Settings::vertSync)
@@ -112,6 +118,7 @@ int main()
             }
             delta = 1.f / Settings::maxFrameRate;
         }
+
         prevTime = currentTime;
         if (Settings::showFpsCounter)
         {

@@ -11,6 +11,8 @@ sf::Text Render::fpsCounter;
 sf::RenderWindow *Render::window;
 vector<sf::RenderTexture *> Render::contexts;
 vector<fv::Color> Render::backgroundColors;
+vector<sf::Texture *> Render::textures;
+vector<std::string> Render::textureNames;
 
 void Render::renderFpsCounter(float d)
 {
@@ -187,11 +189,31 @@ void Render::renderContext(SMath::vec2f pos, int c)
     {
         sf::Sprite maskedSprite(contexts[c - 1]->getTexture());
         maskedSprite.setPosition(pos.x, pos.y);
-        // sf::RenderStates states;
-        // states.transform.scale(1, -1);
-        // states.transform.translate(0, contexts[c - 1]->getSize().y);
         window->draw(maskedSprite);
     }
+}
+
+int Render::addResourse(const char *path, ResourseType type, const char *name)
+{
+    sf::Texture *texture = new sf::Texture;
+    switch (type)
+    {
+    case ResourseType::Texture:
+
+        if (!texture->loadFromFile(path))
+        {
+            return -1;
+        }
+
+        textures.push_back(texture);
+        textureNames.push_back(name);
+        return textures.size() - 1;
+        break;
+
+    default:
+        break;
+    }
+    return -1;
 }
 
 SMath::vec2 Render::getWindowCord(SMath::vec2 p)
@@ -202,6 +224,28 @@ SMath::vec2 Render::getWindowCord(SMath::vec2 p)
 SMath::vec2 Render::getWindowSize()
 {
     return SMath::vec2(Settings::width, Settings::height);
+}
+
+sf::Texture *Render::getTextureByIndex(int id)
+{
+    return textures[id];
+}
+
+int Render::getTextureIndexByName(std::string name)
+{
+    for (int i = 0; i < textureNames.size(); i++)
+    {
+        if (textureNames[i] == name)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void Render::setMouseVisible(bool t)
+{
+    window->setMouseCursorVisible(t);
 }
 
 void Render::render(CircleShape *c, int context)

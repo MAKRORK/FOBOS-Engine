@@ -4,34 +4,25 @@
 #include "Collider.h"
 #include "SFML/Graphics.hpp"
 #include "fstream"
-// #include "time.h"
-// #include "windows.h"
-
-// int n = 300;
 
 std::ofstream file("../logs/log.txt");
 
 int BVH::createBVH(std::vector<Collider *> &vec, SMath::Geometry::RectGeometry rect)
 {
-    // n--;
-    // if (n <= 0)
-    //     return -1;
     if (vec.size() == 0)
     {
         return -1;
     }
-    World::addObject(new Object());
-    Object *obj = World::getObjectByIndex(World::getObjectCount() - 1);
 
     if (vec.size() == 1)
     {
         int id;
         rect.tl = vec[0]->getTopLeft();
         rect.br = vec[0]->getButtomRigth();
-        obj->addChildren(new LineShape(SMath::side(rect.tl, SMath::vec2f(rect.br.x, rect.tl.y)), fv::Color::red));
-        obj->addChildren(new LineShape(SMath::side(rect.br, SMath::vec2f(rect.br.x, rect.tl.y)), fv::Color::blue));
-        obj->addChildren(new LineShape(SMath::side(rect.tl, SMath::vec2f(rect.tl.x, rect.br.y)), fv::Color::green));
-        obj->addChildren(new LineShape(SMath::side(rect.br, SMath::vec2f(rect.tl.x, rect.br.y)), fv::Color::yellow));
+        // obj->addChildren(new LineShape(SMath::side(rect.tl, SMath::vec2f(rect.br.x, rect.tl.y)), fv::Color::red));
+        // obj->addChildren(new LineShape(SMath::side(rect.br, SMath::vec2f(rect.br.x, rect.tl.y)), fv::Color::blue));
+        // obj->addChildren(new LineShape(SMath::side(rect.tl, SMath::vec2f(rect.tl.x, rect.br.y)), fv::Color::green));
+        // obj->addChildren(new LineShape(SMath::side(rect.br, SMath::vec2f(rect.tl.x, rect.br.y)), fv::Color::yellow));
         branches.push_back(BVHbranch());
         id = branches.size() - 1;
         branches[id].rect = rect;
@@ -49,25 +40,15 @@ int BVH::createBVH(std::vector<Collider *> &vec, SMath::Geometry::RectGeometry r
         rect.br.x = max(rect.br.x, c->getButtomRigth().x);
         rect.br.y = max(rect.br.y, c->getButtomRigth().y);
     }
-    obj->addChildren(new LineShape(SMath::side(rect.tl, SMath::vec2f(rect.br.x, rect.tl.y)), fv::Color::red));
-    obj->addChildren(new LineShape(SMath::side(rect.br, SMath::vec2f(rect.br.x, rect.tl.y)), fv::Color::blue));
-    obj->addChildren(new LineShape(SMath::side(rect.tl, SMath::vec2f(rect.tl.x, rect.br.y)), fv::Color::green));
-    obj->addChildren(new LineShape(SMath::side(rect.br, SMath::vec2f(rect.tl.x, rect.br.y)), fv::Color::yellow));
-    // file << vec.size() << "\n";
-    //  for (int i = 0; i < vec.size(); i++)
-    //  {
-    //      file << "{" << vec[i]->getTopLeft() << ", " << vec[i]->getButtomRigth() << "}\n";
-    //      // file << "{" << vec[1]->getTopLeft() << ", " << vec[1]->getButtomRigth() << "}\n";
-    //  }
+    // obj->addChildren(new LineShape(SMath::side(rect.tl, SMath::vec2f(rect.br.x, rect.tl.y)), fv::Color::red));
+    // obj->addChildren(new LineShape(SMath::side(rect.br, SMath::vec2f(rect.br.x, rect.tl.y)), fv::Color::blue));
+    // obj->addChildren(new LineShape(SMath::side(rect.tl, SMath::vec2f(rect.tl.x, rect.br.y)), fv::Color::green));
+    // obj->addChildren(new LineShape(SMath::side(rect.br, SMath::vec2f(rect.tl.x, rect.br.y)), fv::Color::yellow));
+
     float vl = (rect.tl.x + rect.br.x) / 2.f;
-    // std::vector<Collider *> colls = checkLineV(vl, vec);
+
     float r = vl, l = vl;
-    // std::file << vec.size() << "\n";
-    // for (int i = 0; i < branches.size(); i++)
-    // {
-    //     file << "id: " << i << " [" << branches[i].childs[0] << ", " << branches[i].childs[1] << "]\n";
-    //     file << "{" << branches[i].rect.tl << ", " << branches[i].rect.br << "}\n";
-    // }
+
     std::vector<Collider *> lc;
     std::vector<Collider *> rc;
 
@@ -145,13 +126,10 @@ int BVH::createBVH(std::vector<Collider *> &vec, SMath::Geometry::RectGeometry r
     branches.push_back(BVHbranch());
     id = branches.size() - 1;
     branches[id].rect = rect;
-    // file << "l: " << l << " r: " << r << " S = " << sv << "\n";
-    // file << "t: " << t << " b: " << b << " S = " << sh << "\n";
 
     if (sv < sh)
     {
-        // obj->addChildren(new LineShape(SMath::side(SMath::vec2f(l, rect.tl.y), SMath::vec2f(l, rect.br.y)), fv::Color::red));
-        // obj->addChildren(new LineShape(SMath::side(SMath::vec2f(r, rect.tl.y), SMath::vec2f(r, rect.br.y)), fv::Color::blue));
+
         SMath::Geometry::RectGeometry lr;
         lr.tl = rect.tl;
         lr.br = SMath::vec2f(r, rect.br.y);
@@ -163,8 +141,7 @@ int BVH::createBVH(std::vector<Collider *> &vec, SMath::Geometry::RectGeometry r
     }
     else
     {
-        // obj->addChildren(new LineShape(SMath::side(SMath::vec2f(rect.tl.x, t), SMath::vec2f(rect.br.x, t)), fv::Color::red));
-        // obj->addChildren(new LineShape(SMath::side(SMath::vec2f(rect.tl.x, b), SMath::vec2f(rect.br.x, b)), fv::Color::blue));
+
         SMath::Geometry::RectGeometry tr;
         tr.tl = rect.tl;
         tr.br = SMath::vec2f(rect.br.x, b);
@@ -175,9 +152,28 @@ int BVH::createBVH(std::vector<Collider *> &vec, SMath::Geometry::RectGeometry r
         branches[id].childs[1] = createBVH(bc, br);
     }
 
-    // Sleep(100);
-    // sf::sleep(sf::milliseconds(100));
     return id;
+}
+
+void BVH::dfsToBVH(std::vector<Collider *> &vec, int start, SMath::Geometry::RectGeometry rect)
+{
+    if (Collider::checkCollisionRects(rect, branches[start].rect))
+    {
+        if (branches[start].collider)
+        {
+            vec.push_back(branches[start].collider);
+        }
+        else
+        {
+            for (int i = 0; i < 2; i++)
+            {
+                if (branches[start].childs[i] != -1)
+                {
+                    dfsToBVH(vec, branches[start].childs[i], rect);
+                }
+            }
+        }
+    }
 }
 
 void BVH::createNewBVH(std::vector<Collider *> &vec)
@@ -185,22 +181,30 @@ void BVH::createNewBVH(std::vector<Collider *> &vec)
     SMath::Geometry::RectGeometry r;
     r.tl = vec[0]->getTopLeft();
     r.br = vec[0]->getButtomRigth();
-
+    if (this->obj)
+    {
+        World::removeObject(obj);
+        obj = nullptr;
+    }
+    World::addObject(new Object());
+    obj = World::getObjectByIndex(World::getObjectCount() - 1);
     for (Collider *c : vec)
     {
         r.tl.x = min(r.tl.x, c->getTopLeft().x);
         r.tl.y = min(r.tl.y, c->getTopLeft().y);
         r.br.x = max(r.br.x, c->getButtomRigth().x);
         r.br.y = max(r.br.y, c->getButtomRigth().y);
-        // std::cout << c->getTopLeft() << " | " << c->getButtomRigth() << "\n";
     }
-    // std::cout << r.tl << "    " << r.br << "\n";
-    //  branches.push_back(bvh);
+
+    branches.clear();
     createBVH(vec, r);
-    // for (int i = 0; i < branches.size(); i++)
-    // {
-    //     cout << "id: " << i << " [" << branches[i].childs[0] << ", " << branches[i].childs[1] << "]\n";
-    //     cout << "{" << branches[i].rect.tl << ", " << branches[i].rect.br << "}\n";
-    // }
+
     file.close();
+}
+
+std::vector<Collider *> BVH::getobjects(SMath::Geometry::RectGeometry rect)
+{
+    std::vector<Collider *> res;
+    dfsToBVH(res, 0, rect);
+    return res;
 }

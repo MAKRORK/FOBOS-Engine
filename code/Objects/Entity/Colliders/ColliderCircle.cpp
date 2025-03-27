@@ -18,51 +18,53 @@ void ColliderCircle::collision()
     Entity *p = dynamic_cast<Entity *>(getParent());
     if (!p)
         return;
-    for (int i = 0; i < World::getObjectCount(); i++)
+    SMath::Geometry::RectGeometry rect;
+    rect.tl = getTopLeft() + p->getVel();
+    rect.br = getButtomRigth() + p->getVel();
+    vector<Collider *> colls = getBVHObjects(rect);
+    for (int i = 0; i < colls.size(); i++)
     {
 
-        Object *obj = World::getObjectByIndex(i);
-        if (obj == getParent())
+        Object *obj = colls[i]->getParent();
+        if (obj == getParent() && obj)
             continue;
-        if (obj->getColliderObject())
+
+        Collider *col;
+
+        col = colls[i];
+
+        if (col)
         {
-            Collider *col;
-
-            col = dynamic_cast<Collider *>(obj->getColliderObject());
-
-            if (col)
+            if (col->getType() == COLLIDER_TYPE_LINE)
             {
-                if (col->getType() == COLLIDER_TYPE_LINE)
+                ColliderLine *l = dynamic_cast<ColliderLine *>(col);
+
+                p->addImpulse(Collider::getMTVPolyCircle(l->getLine(), p->getWorldPos() + p->getVel(), getRadius()));
+            }
+
+            else if (col->getType() == COLLIDER_TYPE_RECT)
+            {
+                ColliderRect *rect = dynamic_cast<ColliderRect *>(col);
+
+                p->addImpulse(Collider::getMTVPolyCircle(rect->getSides(), p->getWorldPos() + p->getVel(), getRadius()));
+            }
+
+            else if (col->getType() == COLLIDER_TYPE_CIRCLE)
+            {
+                ColliderCircle *c = dynamic_cast<ColliderCircle *>(col);
+                SMath::vec2f h = (p->getWorldPos() + p->getVel()) - c->getWorldPos();
+                if (SMath::length(h) < getRadius() + c->getRadius())
                 {
-                    ColliderLine *l = dynamic_cast<ColliderLine *>(col);
+                    SMath::vec2f mtv = SMath::normalize(h) * ((getRadius() + c->getRadius()) - SMath::length(h));
 
-                    p->addImpulse(Collider::getMTVPolyCircle(l->getLine(), p->getWorldPos() + p->getVel(), getRadius()));
+                    p->addImpulse(mtv);
                 }
+            }
+            else if (col->getType() == COLLIDER_TYPE_POLY)
+            {
+                ColliderPolygon *pol = dynamic_cast<ColliderPolygon *>(col);
 
-                else if (col->getType() == COLLIDER_TYPE_RECT)
-                {
-                    ColliderRect *rect = dynamic_cast<ColliderRect *>(col);
-
-                    p->addImpulse(Collider::getMTVPolyCircle(rect->getSides(), p->getWorldPos() + p->getVel(), getRadius()));
-                }
-
-                else if (col->getType() == COLLIDER_TYPE_CIRCLE)
-                {
-                    ColliderCircle *c = dynamic_cast<ColliderCircle *>(col);
-                    SMath::vec2f h = (p->getWorldPos() + p->getVel()) - c->getWorldPos();
-                    if (SMath::length(h) < getRadius() + c->getRadius())
-                    {
-                        SMath::vec2f mtv = SMath::normalize(h) * ((getRadius() + c->getRadius()) - SMath::length(h));
-
-                        p->addImpulse(mtv);
-                    }
-                }
-                else if (col->getType() == COLLIDER_TYPE_POLY)
-                {
-                    ColliderPolygon *pol = dynamic_cast<ColliderPolygon *>(col);
-
-                    p->addImpulse(Collider::getMTVPolyCircle(pol->getSides(), p->getWorldPos() + p->getVel(), getRadius()));
-                }
+                p->addImpulse(Collider::getMTVPolyCircle(pol->getSides(), p->getWorldPos() + p->getVel(), getRadius()));
             }
         }
     }

@@ -11,6 +11,7 @@ namespace fv
         uint8 r, g, b, a;
 
         Color();
+        Color(uint8 _c);
         Color(uint8 _r, uint8 _g, uint8 _b);
         Color(uint8 _r, uint8 _g, uint8 _b, uint8 _a);
 

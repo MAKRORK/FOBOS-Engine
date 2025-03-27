@@ -50,11 +50,11 @@ SMath::vec2f SMath::getVectorFromAngle(float a)
 {
     return SMath::vec2f(cosf(a), sinf(a));
 }
-float SMath::ang2rad(float a)
+float SMath::deg2rad(float a)
 {
     return a / 180.f * pi;
 }
-float SMath::rad2ang(float r)
+float SMath::rad2deg(float r)
 {
     return r * 180.f / pi;
 }
@@ -73,6 +73,33 @@ float SMath::clamp(float a, float mn, float mx)
     if (a > mx)
         return mx;
     return a;
+}
+int SMath::clamp(int a, int mn, int mx)
+{
+    if (a < mn)
+        return mn;
+    if (a > mx)
+        return mx;
+    return a;
+}
+float SMath::getAngleFromVector(SMath::vec2f v)
+{
+    return atan2(v.y, v.x);
+}
+float SMath::correctAngle(float angle)
+{
+    float tau = 2 * pi;
+
+    while (angle > tau)
+    {
+        angle -= tau;
+    }
+
+    while (angle < 0.f)
+    {
+        angle += tau;
+    }
+    return angle;
 }
 float SMath::distToLine(SMath::vec2f p1, SMath::vec2f p2, SMath::vec2f p)
 {

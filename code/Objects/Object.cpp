@@ -1,6 +1,7 @@
 #include "Object.h"
 #include "Entity/Colliders/Collider.h"
 #include "../Visual/Shape.h"
+#include "../Interfaces/World.h"
 #include <cmath>
 
 Object::Object()
@@ -104,6 +105,19 @@ int Object::addChildren(Object *child)
     return childrens.size() - 1;
 }
 
+void Object::replaceChildren(Object *child, Object *new_child)
+{
+    for (int i = 0; i < childrens.size(); i++)
+    {
+        if (childrens[i] == child)
+        {
+            childrens[i] = new_child;
+            delete child;
+            break;
+        }
+    }
+}
+
 void Object::setParent(Object *_parent)
 {
     parent = _parent;
@@ -144,4 +158,9 @@ vector<Object *> Object::getShapes()
 SMath::vec2f Object::getForwardVector()
 {
     return SMath::getVectorFromAngle(getWorldRot());
+}
+
+SMath::vec2f Object::getRightVector()
+{
+    return SMath::getVectorFromAngle(getWorldRot() - SMath::pi / 2.f);
 }

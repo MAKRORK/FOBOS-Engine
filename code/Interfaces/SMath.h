@@ -91,12 +91,15 @@ namespace SMath
     float pov(float a, int p);
     side scaledSide(side s, float sc);
     vec2f getVectorFromAngle(float a);
-    float ang2rad(float a);
-    float rad2ang(float r);
+    float deg2rad(float a);
+    float rad2deg(float r);
     const float pi = 3.1415926;
     float sqrLength(SMath::vec2f p);
     float sqrLength(SMath::vec2f p1, SMath::vec2f p2);
     float clamp(float a, float mn, float mx);
+    int clamp(int a, int mn, int mx);
+    float getAngleFromVector(SMath::vec2f v);
+    float correctAngle(float angle);
 }
 
 std::ostream &operator<<(std::ostream &os, const SMath::vec2f &p);

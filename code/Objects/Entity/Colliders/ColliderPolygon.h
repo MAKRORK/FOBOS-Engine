@@ -33,7 +33,7 @@ public:
     SMath::side getSide(int i);
     SMath::side getRelSide(int i);
     vector<SMath::side> getSides();
-    SMath::vec2f getNormal(int i);
+    SMath::vec2f getNormal(int i) override;
 
     void collision() override {}
 };

@@ -2,8 +2,8 @@
 #include "Render.h"
 #include "ForSFML.h"
 
-SMath::vec2 Input::previusMousePos;
-SMath::vec2 Input::delta;
+SMath::vec2 Input::previusMousePos = SMath::vec2(0, 0);
+SMath::vec2 Input::delta = SMath::vec2(0, 0);
 bool Input::centered = false;
 
 void Input::init()
@@ -36,7 +36,7 @@ bool Input::justPressed(sf::Keyboard::Key key)
 
 SMath::vec2 Input::getMousePos()
 {
-    return Render::getWindowCord(forSFML::fromSFMLVectorI(sf::Mouse::getPosition()));
+    return forSFML::fromSFMLVectorI(sf::Mouse::getPosition());
 }
 
 SMath::vec2 Input::getMouseDelta()

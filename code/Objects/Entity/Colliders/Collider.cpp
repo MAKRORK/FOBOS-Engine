@@ -8,12 +8,36 @@
 #include "BVH.h"
 
 vector<Collider *> Collider::colliders;
+vector<Collider *> Collider::statics;
+vector<Collider *> Collider::dynamics;
 BVH *Collider::bvh;
 
 void Collider::setRect(SMath::vec2f _tl, SMath::vec2f _br)
 {
     rect.tl = _tl;
     rect.br = _br;
+}
+
+Collider::~Collider()
+{
+    for (int i = 0; i < statics.size(); i++)
+    {
+        if (statics[i] == this)
+        {
+            statics.erase(statics.begin() + i);
+
+            break;
+        }
+    }
+    for (int i = 0; i < dynamics.size(); i++)
+    {
+        if (dynamics[i] == this)
+        {
+            dynamics.erase(dynamics.begin() + i);
+
+            break;
+        }
+    }
 }
 
 collisionLinesResult Collider::checkCollisionLines(SMath::vec2f s1, SMath::vec2f e1, SMath::vec2f s2, SMath::vec2f e2)
@@ -91,11 +115,17 @@ raycastResult Collider::raycast(SMath::vec2f s, SMath::vec2f e)
 raycastResult Collider::raycast(SMath::vec2f s, SMath::vec2f e, Object *ignore, bool draw, Camera *cam)
 {
     raycastResult result;
+    result.isColliding = false;
     SMath::vec2f nrm = (e - s);
-    for (int i = 0; i < colliders.size(); i++)
+    SMath::Geometry::RectGeometry rect;
+    rect.tl = SMath::vec2f(min(e.x, s.x), min(e.y, s.y));
+    rect.br = SMath::vec2f(max(e.x, s.x), max(e.y, s.y));
+    vector<Collider *> colls = bvh->getobjects(rect);
+    // cout << colls.size() << "\n";
+    for (int i = 0; i < colls.size(); i++)
     {
 
-        Collider *col = colliders[i];
+        Collider *col = colls[i];
         if (ignore && ignore == col->getParent())
             continue;
 
@@ -125,6 +155,7 @@ raycastResult Collider::raycast(SMath::vec2f s, SMath::vec2f e, Object *ignore, 
                             colObj.obj = col->getParent();
                         }
                         colObj.points.push_back(res.point);
+                        colObj.sides.push_back(i);
                     }
                 }
                 if (isColl)
@@ -152,6 +183,7 @@ raycastResult Collider::raycast(SMath::vec2f s, SMath::vec2f e, Object *ignore, 
                             colObj.obj = col->getParent();
                         }
                         colObj.points.push_back(res.point);
+                        colObj.sides.push_back(i);
                     }
                 }
                 if (isColl)
@@ -175,7 +207,7 @@ raycastResult Collider::raycast(SMath::vec2f s, SMath::vec2f e, Object *ignore, 
             }
         }
     }
-    //}
+
     if (!cam)
     {
         cam = World::getMainCamera();
@@ -191,6 +223,97 @@ raycastResult Collider::raycast(SMath::vec2f s, SMath::vec2f e, Object *ignore, 
                 for (int j = 0; j < result.collidedObjects[i].points.size(); j++)
                 {
                     cam->addToRender(new CircleShape(result.collidedObjects[i].points[j], 5.f, fv::Color::red));
+                }
+            }
+        }
+    }
+    return result;
+}
+
+raycastResult Collider::raycastForThread(SMath::vec2f s, SMath::vec2f e, vector<Collider *> colls)
+{
+    raycastResult result;
+    result.isColliding = false;
+    SMath::vec2f nrm = (e - s);
+    for (int i = 0; i < colls.size(); i++)
+    {
+
+        Collider *col = colls[i];
+
+        if (!checkCollisionLC(s, e, col->getCenterCircle() + col->getWorldPos(), col->getRadiusCircle()))
+        {
+            continue;
+        }
+        if (col)
+        {
+
+            if (col->getType() == COLLIDER_TYPE_RECT)
+            {
+                ColliderRect *rect = dynamic_cast<ColliderRect *>(col);
+
+                collidedObject colObj;
+                bool isColl = false;
+                for (int i = 0; i < 4; i++)
+                {
+                    if (SMath::scalar(rect->getNormal(i), nrm) > 0)
+                        continue;
+                    collisionLinesResult res = checkLineIntersection(s, e, rect->getSide(i).p1, rect->getSide(i).p2);
+                    if (res.isColliding)
+                    {
+                        isColl = true;
+                        if (!colObj.obj)
+                        {
+                            colObj.obj = col->getParent();
+                        }
+                        colObj.points.push_back(res.point);
+                        colObj.sides.push_back(i);
+                    }
+                }
+                if (isColl)
+                {
+                    result.isColliding = true;
+                    result.collidedObjects.push_back(colObj);
+                }
+            }
+            else if (col->getType() == COLLIDER_TYPE_POLY)
+            {
+                ColliderPolygon *pol = dynamic_cast<ColliderPolygon *>(col);
+
+                collidedObject colObj;
+                bool isColl = false;
+                for (int i = 0; i < pol->getSize(); i++)
+                {
+                    if (SMath::scalar(pol->getNormal(i), nrm) > 0)
+                        continue;
+                    collisionLinesResult res = checkLineIntersection(s, e, pol->getSide(i).p1, pol->getSide(i).p2);
+                    if (res.isColliding)
+                    {
+                        isColl = true;
+                        if (!colObj.obj)
+                        {
+                            colObj.obj = col->getParent();
+                        }
+                        colObj.points.push_back(res.point);
+                        colObj.sides.push_back(i);
+                    }
+                }
+                if (isColl)
+                {
+                    result.isColliding = true;
+                    result.collidedObjects.push_back(colObj);
+                }
+            }
+            else if (col->getType() == COLLIDER_TYPE_CIRCLE)
+            {
+
+                collisionCircleResult res = intersectLineCircle(s, e, col->getParent()->getWorldPos(), col->getRadiusCircle());
+                if (res.isColliding)
+                {
+                    collidedObject colObj;
+                    colObj.obj = col->getParent();
+                    colObj.points = res.points;
+                    result.isColliding = true;
+                    result.collidedObjects.push_back(colObj);
                 }
             }
         }
@@ -299,6 +422,19 @@ SMath::vec2f Collider::getMTVPolyCircle(SMath::side s, SMath::vec2f c, float r)
     return getMTVPolyCircle(v, c, r);
 }
 
+vector<Collider *> Collider::getCollidersInBVH(SMath::Geometry::RectGeometry rect, Object *ignore)
+{
+    vector<Collider *> bvh_res = bvh->getobjects(rect);
+    for (int i = 0; i < bvh_res.size(); i++)
+    {
+        if (ignore == bvh_res[i]->getParent())
+        {
+            bvh_res.erase(bvh_res.begin() + i);
+        }
+    }
+    return bvh_res;
+}
+
 collisionLinesResult Collider::checkLineIntersection(const SMath::vec2f &A, const SMath::vec2f &B,
                                                      const SMath::vec2f &C, const SMath::vec2f &D)
 {
@@ -329,9 +465,54 @@ bool Collider::checkCollisionLC(const SMath::vec2f &s, const SMath::vec2f &e, co
     return SMath::sqrLength(s + t * d, c) <= r * r;
 }
 
+bool Collider::checkCollisionRects(const SMath::Geometry::RectGeometry &r1, const SMath::Geometry::RectGeometry &r2)
+{
+    return !(r1.br.x <= r2.tl.x || r2.br.x <= r1.tl.x || r1.br.y <= r2.tl.y || r2.br.y <= r1.tl.y);
+}
+
 void Collider::createBVH()
 {
-    bvh = new BVH(colliders);
+    bvh = new BVH(statics);
+}
+
+void Collider::setIsDynamic(bool _d)
+{
+    if (_d)
+    {
+
+        for (int i = 0; i < statics.size(); i++)
+        {
+            if (statics[i] == this)
+            {
+                statics.erase(statics.begin() + i);
+
+                break;
+            }
+        }
+        dynamics.push_back(this);
+    }
+    else
+    {
+        for (int i = 0; i < dynamics.size(); i++)
+        {
+            if (dynamics[i] == this)
+            {
+                dynamics.erase(dynamics.begin() + i);
+                break;
+            }
+        }
+        statics.push_back(this);
+    }
+    isDynamic = _d;
+    if (bvh)
+    {
+        bvh->createNewBVH(statics);
+    }
+}
+
+std::vector<Collider *> Collider::getBVHObjects(SMath::Geometry::RectGeometry rect)
+{
+    return bvh->getobjects(rect);
 }
 
 collisionCircleResult Collider::intersectLineCircle(const SMath::vec2f &p1, const SMath::vec2f &p2, const SMath::vec2f &center, float radius)

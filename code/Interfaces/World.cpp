@@ -1,6 +1,6 @@
 #include "World.h"
 #include "SMath.h"
-#include "../Objects/Blocks/Wall.h"
+#include "../Objects/R3DObjects/WallRect.h"
 #include "../Visual/Shape.h"
 
 std::vector<Object *> World::objects;
@@ -33,10 +33,12 @@ void World::setMap()
         {
             if (map[i][j] == '#')
             {
-                int t = addObject(new Wall(SMath::vec2f(j * 32, i * 32)));
-                RectShape *r = new RectShape(SMath::vec2f(32.f, 32.f));
-                r->setColor(fv::Color::white);
-                getObjectByIndex(t)->addChildren(r);
+                WallRect *w = new WallRect(SMath::vec2f(j * 32.f, i * 32.f), SMath::vec2f(32.f, 32.f));
+                w->setTextureForAllByName("wall1");
+                int t = addObject(w);
+                // RectShape *r = new RectShape(SMath::vec2f(32.f, 32.f));
+                // r->setColor(fv::Color::white);
+                // getObjectByIndex(t)->addChildren(r);
             }
         }
     }
@@ -71,9 +73,23 @@ void World::clear()
     objects.clear();
 }
 
+void World::removeObject(Object *obj)
+{
+    for (int i = 0; i < objects.size(); i++)
+    {
+        if (obj == objects[i])
+        {
+            objects.erase(objects.begin() + i);
+            break;
+        }
+    }
+    delete obj;
+}
+
 int World::addObject(Object *obj)
 {
     objects.push_back(obj);
+    // obj->setID(objects.size() - 1);
     return objects.size() - 1;
 }
 
