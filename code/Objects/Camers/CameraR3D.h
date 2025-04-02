@@ -20,7 +20,7 @@ private:
 
 public:
     CameraR3D() : Camera() { resolution = Render::getWindowSize() / 2; }
-    CameraR3D(SMath::vec2 _size) : Camera(_size) { resolution = Render::getWindowSize(); }
+    CameraR3D(SMath::vec2 _size) : Camera(_size) { resolution = Render::getWindowSize() / 4; }
     CameraR3D(SMath::vec2f _pos, SMath::vec2 _size) : Camera(_pos, _size) { resolution = Render::getWindowSize() / 2; }
 
     void render() override;

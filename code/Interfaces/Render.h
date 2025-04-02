@@ -9,7 +9,13 @@ using namespace std;
 
 enum ResourseType
 {
-    Texture,
+    TextureSource,
+};
+struct TileSet
+{
+    int start;
+    int end;
+    std::string name;
 };
 
 class Render
@@ -46,12 +52,14 @@ public:
     static void renderContext(SMath::vec2f pos, int c);
 
     static int addResourse(const char *path, ResourseType type, const char *name);
+    static void addTexturesFromTileSet(const char *path, const char *name, int h, int v);
 
     static SMath::vec2 getWindowCord(SMath::vec2 p = SMath::vec2());
     static SMath::vec2 getWindowSize();
     static sf::Texture *getTextureByIndex(int id);
     static int getTextureIndexByName(std::string name);
     static void setMouseVisible(bool t);
+    static SMath::vec2 getTexturesFromTileSet(std::string name);
 
 protected:
     static sf::RenderWindow *window;
@@ -63,5 +71,6 @@ private:
     static sf::Text fpsCounter;
     static vector<sf::Texture *> textures;
     static vector<std::string> textureNames;
+    static vector<TileSet> tilesets;
     static void initFpsCounter();
 };

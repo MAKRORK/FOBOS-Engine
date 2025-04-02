@@ -18,12 +18,16 @@ code/Objects/Entity/Colliders/ColliderPolygon.cpp
 code/Objects/Entity/Colliders/BVH.cpp code/Objects/Entity/Colliders/ColliderRect.cpp
 code/Primitives/Primitives2D.cpp code/Objects/Entity/Colliders/ColliderCircle.cpp
 code/Objects/Entity/Colliders/ColliderLine.cpp code/Interfaces/RenderR3D.cpp
-code/Objects/R3DObjects/WallRect.cpp code/Objects/Camers/CameraQ3D.cpp)
+code/Objects/R3DObjects/WallRect.cpp code/Objects/Camers/CameraQ3D.cpp
+code/Objects/R3DObjects/Sprite.cpp code/Objects/GraphicsObjects/Texture.cpp
+code/Objects/GraphicsObjects/AnimatedTexture.cpp)
 
 include_directories(c:/SFML-2.6.2/include)
 
 set(SFML_ROOT c:/SFML-2.6.2)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake_modules")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 find_package(SFML REQUIRED system window graphics network audio)
 if (SFML_FOUND)
     include_directories(${SFML_INCLUDE_DIR})

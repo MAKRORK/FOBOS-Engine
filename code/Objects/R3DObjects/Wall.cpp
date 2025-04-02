@@ -8,6 +8,7 @@
 #include "../Entity/Colliders/ColliderPolygon.h"
 #include "../../Visual/Shape.h"
 #include "../../Global.h"
+#include "../GraphicsObjects/AnimatedTexture.h"
 #include <cmath>
 
 vector<Wall *> Wall::walls;
@@ -71,33 +72,27 @@ int Wall::getSize()
 
 int Wall::getTextureIndex(int side_id)
 {
-    return textures[side_id];
-}
-
-void Wall::setTextureById(int side_id, int texture_id)
-{
-    textures[side_id] = texture_id;
-}
-
-void Wall::setTextureByName(int side_id, std::string name)
-{
-    textures[side_id] = Render::getTextureIndexByName(name);
-}
-
-void Wall::setTextureForAllById(int texture_id)
-{
-    for (int i = 0; i < textures.size(); i++)
+    if (textures[side_id])
     {
-        textures[i] = texture_id;
+        AnimatedTexture *an = dynamic_cast<AnimatedTexture *>(textures[side_id]);
+        if (an)
+            textures[side_id]->getID();
+        return textures[side_id]->getID();
     }
+    else
+        return PLACEHOLDER_TEXTURE_ID;
 }
 
-void Wall::setTextureForAllByName(std::string name)
+void Wall::setTexture(int side_id, Texture *texture)
 {
-    int id = Render::getTextureIndexByName(name);
+    textures[side_id] = texture;
+}
+
+void Wall::setTextureForAll(Texture *texture)
+{
     for (int i = 0; i < textures.size(); i++)
     {
-        textures[i] = id;
+        textures[i] = texture;
     }
 }
 

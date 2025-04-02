@@ -17,8 +17,8 @@ void RenderR3D::renderRayLine(int x, float h, int context, fv::context cont, SMa
     int asp = ceil(size.x / res.x);
     sprite.setPosition(forSFML::toSFMLVector((SMath::vec2f(x * asp, (size.y / 2.f) - h / 2) + cont.offset) * cont.scale));
     sf::Vector2u texSize = getTextureByIndex(texture_id)->getSize();
-    sprite.setTextureRect(sf::IntRect(ceil(aspect * texSize.x), 0, asp, texSize.y));
-    sprite.setScale(1.f, (h * cont.scale) / texSize.y);
+    sprite.setTextureRect(sf::IntRect(ceil(aspect * texSize.x), 0, 1, texSize.y));
+    sprite.setScale(4.f, (h * cont.scale) / texSize.y);
     sprite.setColor(forSFML::toSFMLColor(color));
     // rect.setSize(sf::Vector2f(asp, h * cont.scale));
     if (!context)
@@ -48,4 +48,42 @@ void RenderR3D::renderTrap(float x1, float x2, float h1, float h2, fv::context c
     sf::RenderStates states;
     states.texture = getTextureByIndex(texture_id);
     window->draw(quad, states);
+}
+
+void RenderR3D::renderSky(float angle, int texture_id, int context, fv::context cont, SMath::vec2f size)
+{
+    sf::Vector2u texSize = getTextureByIndex(texture_id)->getSize();
+    float ofset = SMath::correctAngle(angle) / (2 * SMath::pi) * texSize.x;
+
+    sf::Sprite sprite;
+    getTextureByIndex(texture_id)->setRepeated(true);
+    sprite.setTexture(*getTextureByIndex(texture_id));
+    sprite.setPosition(sf::Vector2f(0.f, 0.f));
+    sprite.setTextureRect(sf::IntRect(ceil(ofset), 0, size.x, texSize.y));
+
+    window->draw(sprite);
+}
+
+void RenderR3D::renderFloor(int context, fv::context cont, SMath::vec2f size)
+{
+    sf::RectangleShape rect;
+    rect.setSize(sf::Vector2f(size.x, size.y / 2));
+    rect.setFillColor(forSFML::toSFMLColor(fv::Color(43)));
+    rect.setPosition(sf::Vector2f(0.f, size.y / 2.f));
+    window->draw(rect);
+}
+
+void RenderR3D::renderSprite(SMath::vec2 pos, int texture_id, int context, fv::context cont, SMath::vec2f size, SMath::vec2 screenSize)
+{
+    sf::Vector2u texSize = getTextureByIndex(texture_id)->getSize();
+
+    sf::Sprite sprite;
+    // cout << "ha\n";
+    sprite.setTexture(*getTextureByIndex(texture_id));
+    // cout << size << "\n";
+    sprite.setPosition(forSFML::toSFMLVector(pos * cont.scale + SMath::vec2((int)cont.offset.x, (int)cont.offset.y)));
+    size *= screenSize.y;
+    sprite.setScale(sf::Vector2f(size.x / texSize.x, size.y / texSize.y));
+
+    window->draw(sprite);
 }

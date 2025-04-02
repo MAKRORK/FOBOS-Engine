@@ -87,6 +87,7 @@ public:
     static raycastResult raycast(SMath::vec2f s, SMath::vec2f e);
     static raycastResult raycast(SMath::vec2f s, SMath::vec2f e, Object *ignore, bool draw = false, Camera *cam = nullptr);
     static raycastResult raycastForThread(SMath::vec2f s, SMath::vec2f e, vector<Collider *> colls);
+
     static collisionCircleResult checkCollisionLineWithCircle(SMath::vec2f s1, SMath::vec2f e1, SMath::vec2f c, float r);
     static collisionCircleResult checkCollisionLineWithCircle(SMath::side s, SMath::vec2f c, float r);
     static collisionCircleResult intersectLineCircle(const SMath::vec2f &p1, const SMath::vec2f &p2, const SMath::vec2f &center, float radius);

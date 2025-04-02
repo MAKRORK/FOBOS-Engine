@@ -13,6 +13,7 @@ vector<sf::RenderTexture *> Render::contexts;
 vector<fv::Color> Render::backgroundColors;
 vector<sf::Texture *> Render::textures;
 vector<std::string> Render::textureNames;
+vector<TileSet> Render::tilesets;
 
 void Render::renderFpsCounter(float d)
 {
@@ -198,7 +199,7 @@ int Render::addResourse(const char *path, ResourseType type, const char *name)
     sf::Texture *texture = new sf::Texture;
     switch (type)
     {
-    case ResourseType::Texture:
+    case ResourseType::TextureSource:
 
         if (!texture->loadFromFile(path))
         {
@@ -214,6 +215,45 @@ int Render::addResourse(const char *path, ResourseType type, const char *name)
         break;
     }
     return -1;
+}
+
+void Render::addTexturesFromTileSet(const char *path, const char *name, int h, int v)
+{
+    sf::Image image;
+    if (!image.loadFromFile(path))
+    {
+        return;
+    }
+
+    sf::Vector2u size = image.getSize();
+
+    int x = size.x / h;
+    int y = size.y / v;
+    TileSet ts;
+    ts.start = textures.size();
+    for (int i = 0; i < v; i++)
+    {
+        for (int j = 0; j < h; j++)
+        {
+            sf::Texture *texture = new sf::Texture;
+            if (!texture->loadFromFile(path, sf::IntRect(j * x, i * y, x, y)))
+            {
+                return;
+            }
+
+            textures.push_back(texture);
+            string nm = name;
+            textureNames.push_back(nm + to_string(i * h + j));
+        }
+    }
+    ts.end = textures.size();
+
+    ts.name = name;
+    tilesets.push_back(ts);
+    for (int i = 0; i < textureNames.size(); i++)
+    {
+        cout << textureNames[i] << "\n";
+    }
 }
 
 SMath::vec2 Render::getWindowCord(SMath::vec2 p)
@@ -246,6 +286,18 @@ int Render::getTextureIndexByName(std::string name)
 void Render::setMouseVisible(bool t)
 {
     window->setMouseCursorVisible(t);
+}
+
+SMath::vec2 Render::getTexturesFromTileSet(std::string name)
+{
+    for (TileSet t : tilesets)
+    {
+        if (t.name == name)
+        {
+            return SMath::vec2(t.start, t.end);
+        }
+    }
+    return SMath::vec2(0, 0);
 }
 
 void Render::render(CircleShape *c, int context)

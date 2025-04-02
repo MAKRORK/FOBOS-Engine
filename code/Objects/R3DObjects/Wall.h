@@ -5,6 +5,7 @@
 #include "../Entity/Colliders/Collider.h"
 #include "../../Visual/Shape.h"
 #include <iostream>
+#include "../GraphicsObjects/Texture.h"
 
 class Wall;
 
@@ -19,7 +20,8 @@ struct sideWall
 class Wall : public R3DObject
 {
 private:
-    vector<int> textures;
+    vector<Texture *> textures = {nullptr};
+
     vector<SMath::vec2f> points;
     Collider *wallCollider = nullptr;
     Shape *wallShape = nullptr;
@@ -38,10 +40,9 @@ public:
     int getSize();
     int getTextureIndex(int side_id);
 
-    void setTextureById(int side_id, int texture_id);
-    void setTextureByName(int side_id, std::string name);
-    void setTextureForAllById(int texture_id);
-    void setTextureForAllByName(std::string name);
+    void setTexture(int side_id, Texture *texture);
+    void setTextureForAll(Texture *texture);
+
     void create();
 
     virtual SMath::vec2f getNormal(int id);

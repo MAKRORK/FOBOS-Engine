@@ -48,14 +48,14 @@ void CameraQ3D::render()
         // }
         float dx1 = sw.wall->getSide(sw.side_id).p1.x - wp.x;
         float dy1 = sw.wall->getSide(sw.side_id).p1.y - wp.y;
-        float xx1 = dx1 * cos(-a) - dy1 * sin(-a);
-        float yy1 = dx1 * sin(-a) + dy1 * cos(-a);
+        float xx1 = dx1 * SMath::fast_cos(-a) - dy1 * SMath::fast_sin(-a);
+        float yy1 = dx1 * SMath::fast_sin(-a) + dy1 * SMath::fast_cos(-a);
         float x1 = getSize().x / 2.f + (yy1 / xx1) * getSize().x;
 
         float dx2 = sw.wall->getSide(sw.side_id).p2.x - wp.x;
         float dy2 = sw.wall->getSide(sw.side_id).p2.y - wp.y;
-        float xx2 = dx2 * cos(-a) - dy2 * sin(-a);
-        float yy2 = dx2 * sin(-a) + dy2 * cos(-a);
+        float xx2 = dx2 * SMath::fast_cos(-a) - dy2 * SMath::fast_sin(-a);
+        float yy2 = dx2 * SMath::fast_sin(-a) + dy2 * SMath::fast_cos(-a);
         float x2 = getSize().x / 2.f + (yy2 / xx2) * getSize().x;
         RenderR3D::renderTrap(x1, x2, h1, h2, getContext(), getSize(), 0);
     }

@@ -331,7 +331,7 @@ collisionCircleResult Collider::checkCollisionLineWithCircle(SMath::vec2f s1, SM
     {
         if (abs(s2.x) > r)
         {
-            float y = sqrt(r * r - s2.x * s2.x);
+            float y = SMath::fastSqrt(r * r - s2.x * s2.x);
             result.points.push_back(SMath::vec2f(s2.x, y) + c);
             if (y != 0)
             {
@@ -354,8 +354,8 @@ collisionCircleResult Collider::checkCollisionLineWithCircle(SMath::vec2f s1, SM
         result.isColliding = false;
         return result;
     }
-    float x1 = (-B + sqrt(D)) / (2.f * A);
-    float x2 = (-B - sqrt(D)) / (2.f * A);
+    float x1 = (-B + SMath::fastSqrt(D)) / (2.f * A);
+    float x2 = (-B - SMath::fastSqrt(D)) / (2.f * A);
     float y1 = k * x1 + b;
     float y2 = k * x2 + b;
     x1 += c.x;
@@ -534,7 +534,7 @@ collisionCircleResult Collider::intersectLineCircle(const SMath::vec2f &p1, cons
         return result;
     }
 
-    discriminant = std::sqrt(discriminant);
+    discriminant = SMath::fastSqrt(discriminant);
     float t1 = (-b - discriminant) / (2 * a);
     float t2 = (-b + discriminant) / (2 * a);
 

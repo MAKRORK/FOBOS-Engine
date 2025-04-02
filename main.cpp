@@ -20,6 +20,8 @@
 #include "code/Global.h"
 #include "code/Algoritms/GeometryAlgoritms.h"
 #include "code/Objects/R3DObjects/Wall.h"
+#include "code/Objects/R3DObjects/Sprite.h"
+#include "code/Objects/GraphicsObjects/AnimatedTexture.h"
 
 #include <array>
 
@@ -29,9 +31,10 @@ int main()
 {
     sf::RenderWindow window(sf::VideoMode(Settings::width, Settings::height), "Huita");
     Render::init(&window);
-    Render::addResourse("C:\\Users\\user\\Desktop\\Things\\Projects\\ConsoleTesting\\assets\\img\\WallTextures\\2.png", ResourseType::Texture, "wall1");
-    Render::addResourse("C:\\Users\\user\\Desktop\\Things\\Projects\\ConsoleTesting\\assets\\img\\WallTextures\\3.png", ResourseType::Texture, "wall2");
-
+    Render::addResourse("C:\\Users\\user\\Desktop\\Things\\Projects\\ConsoleTesting\\assets\\img\\WallTextures\\2.png", ResourseType::TextureSource, "wall1");
+    Render::addResourse("C:\\Users\\user\\Desktop\\Things\\Projects\\ConsoleTesting\\assets\\img\\WallTextures\\3.png", ResourseType::TextureSource, "wall2");
+    Render::addResourse("C:\\Users\\user\\Desktop\\Things\\Projects\\ConsoleTesting\\assets\\img\\WallTextures\\sky.jpeg", ResourseType::TextureSource, "sky");
+    Render::addTexturesFromTileSet("C:\\Users\\user\\Desktop\\Things\\Projects\\ConsoleTesting\\assets\\img\\Animations\\HappySheep_Bouncing.png", "sheep", 6, 1);
     World::setMap();
 
     Input::init();
@@ -71,8 +74,14 @@ int main()
     w->create();
 
     w->setPos(SMath::vec2f(500.f, 250.f));
-    w->setTextureForAllByName("wall2");
-    w->setTextureByName(1, "wall1");
+    w->setTextureForAll(new Texture("wall2"));
+    AnimatedTexture *an = new AnimatedTexture(8);
+    an->setDelta(0.2);
+    an->setFramesFromTileset("sheep");
+    Sprite *sp = new Sprite(SMath::vec2f(48.f, 48.f), 20.f, an);
+    sp->addChildren(new CircleShape(20.f, fv::Color::magenta));
+    World::addObject(sp);
+    // w->setTexture(0, an);
     World::addObject(w);
 
     sf::Clock clock;
@@ -97,6 +106,8 @@ int main()
         }
 
         Input::update();
+        AnimatedTexture::updateAll(delta);
+        // cout << an->getCurrent() << "\n";
 
         Render::clearAllContext();
 

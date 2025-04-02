@@ -9,7 +9,7 @@ using namespace std;
 
 double dist(const SMath::vec2f &a, const SMath::vec2f &b)
 {
-    return sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
+    return SMath::fastSqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
 }
 
 SMath::Geometry::CircleGeometry SMath::Geometry::circleFromTwoPoints(const SMath::vec2f &p1, const SMath::vec2f &p2)

@@ -5,6 +5,7 @@
 #include "../R3DObjects/Wall.h"
 #include <cmath>
 #include <thread>
+#include "../R3DObjects/Sprite.h"
 
 // void CameraR3D::render()
 // {
@@ -48,7 +49,7 @@
 //                 }
 //             }
 
-//             float dist = sqrt(md) * cos(abs(s - getWorldRot()));
+//             float dist = SMath::fastSqrt(md) * SMath::fast_cos(abs(s - getWorldRot()));
 //             float h = (50.f * getSize().y) / dist;
 //             Wall *w = dynamic_cast<Wall *>(res.collidedObjects[id].obj);
 //             SMath::side s = w->getSide(side_id);
@@ -58,6 +59,14 @@
 //         }
 //     }
 // }
+bool comp(lineToRender a, lineToRender b)
+{
+    return a.dist > b.dist;
+}
+bool compSpr(SpriteToRender a, SpriteToRender b)
+{
+    return a.dist > b.dist;
+}
 vector<lineToRender> CameraR3D::lines;
 
 void CameraR3D::render()
@@ -65,20 +74,24 @@ void CameraR3D::render()
     float f = SMath::deg2rad(fov);
     lines.clear();
     lines.resize(resolution.x);
+    SMath::vec2f wp = getWorldPos();
+    float wr = getWorldRot();
     int numThreads = std::thread::hardware_concurrency();
     std::vector<std::thread> threads(numThreads);
-    SMath::vec2f med = (getWorldPos() + (getWorldPos() + getForwardVector() * distance)) / 2;
+    SMath::vec2f med = (wp + (wp + getForwardVector() * distance)) / 2;
     SMath::Geometry::RectGeometry rect;
     rect.tl = med - distance / 2.f;
     rect.br = med + distance / 2.f;
-    SMath::vec2f wp = getWorldPos();
+
     vector<Collider *> colls = Collider::getCollidersInBVH(rect, getParent());
-    // cout << numThreads << "\n";
+
+    float start_ang = wr - f / 2.f;
+    float step = (f / resolution.x);
     auto renderChunk = [&](int start, int end)
     {
         for (int i = start; i < end; i++)
         {
-            float s = getWorldRot() - f / 2.f + (f / resolution.x) * i;
+            float s = start_ang + step * i;
             SMath::vec2f end = wp + SMath::getVectorFromAngle(s) * distance;
             raycastResult res = Collider::raycastForThread(wp, end, colls);
 
@@ -103,7 +116,7 @@ void CameraR3D::render()
                     }
                 }
 
-                float dist = sqrt(md) * cos(abs(s - getWorldRot()));
+                float dist = SMath::fastSqrt(md) * SMath::fast_cos(s - wr);
                 float h = (50.f * getSize().y) / dist;
                 Wall *w = dynamic_cast<Wall *>(res.collidedObjects[id].obj);
                 SMath::side s = w->getSide(side_id);
@@ -113,7 +126,6 @@ void CameraR3D::render()
                 lines[i].dist = dist;
                 lines[i].aspect = aspect;
                 lines[i].tex_id = w->getTextureIndex(side_id);
-                // RenderR3D::renderRayLine(i, h, getRenderContext(), getContext(), resolution, getSize(), dist, aspect, w->getTextureIndex(side_id));
             }
         }
     };
@@ -130,8 +142,29 @@ void CameraR3D::render()
     {
         t.join();
     }
+    sort(lines.begin(), lines.end(), comp);
+    float screenAsp = (float)getSize().x / getSize().y;
+    vector<SpriteToRender> str = Sprite::getSpritesToRender(wp, distance, f, wr);
+    int n = 0;
+    // cout << screenAsp << "\n";
+    RenderR3D::renderSky(getWorldRot(), 2, getRenderContext(), getContext(), getSize());
+    RenderR3D::renderFloor(getRenderContext(), getContext(), getSize());
     for (lineToRender l : lines)
     {
+        if (n < str.size() && str[n].dist > l.dist)
+        {
+            // cout << (str[n].w * screenAsp) * getSize().x << "\n";
+            RenderR3D::renderSprite(SMath::vec2(str[n].x * getSize().x / 2 - (str[n].w / 2) * getSize().x, getSize().y / 2 - (str[n].h / 2) * getSize().y), str[n].sprite->getTextureIndex(), getRenderContext(), getContext(), SMath::vec2f(str[n].w * screenAsp, str[n].h), getSize());
+            n++;
+        }
+
         RenderR3D::renderRayLine(l.x, l.h, getRenderContext(), getContext(), resolution, getSize(), l.dist, l.aspect, l.tex_id);
+    }
+
+    while (n < str.size())
+    {
+        // /cout << SMath::vec2(str[n].x * getSize().x / 2 - (str[n].w / 2) * getSize().x, getSize().y / 2 - (str[n].h / 2) * getSize().y) << " " << SMath::vec2f(str[n].w * screenAsp, str[n].h) * getSize().y << " " << str[0].dist << "\n";
+        RenderR3D::renderSprite(SMath::vec2(str[n].x * getSize().x / 2 - (str[n].w / 2) * getSize().x, getSize().y / 2 - (str[n].h / 2) * getSize().y), str[n].sprite->getTextureIndex(), getRenderContext(), getContext(), SMath::vec2f(str[n].w * screenAsp, str[n].h), getSize());
+        n++;
     }
 }

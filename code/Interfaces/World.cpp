@@ -16,7 +16,7 @@ void World::setMap()
     map[0] = "####################";
     map[1] = "#                  #";
     map[2] = "#           ########";
-    map[3] = "######      #      #";
+    map[3] = "#           #      #";
     map[4] = "#           #      #";
     map[5] = "#           #      #";
     map[6] = "######  #####      #";
@@ -34,7 +34,7 @@ void World::setMap()
             if (map[i][j] == '#')
             {
                 WallRect *w = new WallRect(SMath::vec2f(j * 32.f, i * 32.f), SMath::vec2f(32.f, 32.f));
-                w->setTextureForAllByName("wall1");
+                w->setTextureForAll(new Texture("wall1"));
                 int t = addObject(w);
                 // RectShape *r = new RectShape(SMath::vec2f(32.f, 32.f));
                 // r->setColor(fv::Color::white);
